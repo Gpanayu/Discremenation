@@ -1,6 +1,5 @@
 package logic;
 
-import javafx.scene.canvas.GraphicsContext;
 import sharedObject.IRenderable;
 
 public abstract class Entity implements IRenderable{
@@ -9,7 +8,9 @@ public abstract class Entity implements IRenderable{
 	protected int z;
 	protected boolean visible,destroyed;
 	
-	protected Entity(){
+	protected Entity(int x, int y){
+		this.x = x;
+		this.y = y;
 		visible = true;
 		destroyed = false;
 	}

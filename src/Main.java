@@ -16,7 +16,7 @@ public class Main extends Application {
 		StackPane root = new StackPane();
 		Scene scene = new Scene(root);
 		primaryStage.setScene(scene);
-		primaryStage.setTitle("Black & White");
+		primaryStage.setTitle("Discremenation");
 
 		GameLogic logic = new GameLogic();
 		GameScreen gameScreen = new GameScreen(1500, 800);
@@ -34,6 +34,10 @@ public class Main extends Application {
 			}
 		};
 		animation.start();
+	}
+	
+	public void stop() throws Exception{
+		//stop all threads
 	}
 
 	public static void main(String[] args) {
