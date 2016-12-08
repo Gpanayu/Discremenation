@@ -9,7 +9,11 @@ public abstract class Slasher extends Entity{
 	protected int speedY;
 	protected int accelerationX;
 	protected int accelerationY;
+	protected boolean isRun;
+	protected boolean isStun;
+	protected boolean isSlash;
 	protected boolean isJump;
+	protected boolean isDead;
 	
 	public static final int DIRECTION_RIGHT = 1;
 	public static final int DIRECTION_LEFT = -1;
@@ -99,6 +103,14 @@ public abstract class Slasher extends Entity{
 	protected void setAccelerationY(int accelerationY) {
 		this.accelerationY = accelerationY;
 	}
+	
+	protected void setIsDead(boolean a){
+		this.isDead = a;
+	}
+	
+	protected boolean getIsDead(boolean a){
+		return isDead;
+	}
 
 	
 	protected void jump(){
@@ -135,6 +147,20 @@ public abstract class Slasher extends Entity{
 			}
 		}
 	}
+	public void draw(){
+		if(this.isRun){
+			SlasherAnimation.run(this, x, y);
+		}else if(this.isJump){
+			SlasherAnimation.jump(this,x,y);
+		}else if(this.isSlash){
+			SlasherAnimation.slash(this,x,y);
+		}else if(this.isStun){
+			SlasherAnimation.stun(this,x,y);
+		}else if(this.isDead){
+			
+		}
+	}
+			
 	
 	protected abstract void useSkill();
 }
