@@ -11,11 +11,6 @@ public abstract class Slasher extends Entity{
 	protected int speedY;
 	protected int accelerationX;
 	protected int accelerationY;
-	protected boolean isRun;
-	protected boolean isStun;
-	protected boolean isSlash;
-	protected boolean isJump;
-	protected boolean isDead;
 	protected int lives;
 	protected boolean[] states;
 	protected boolean[] prevStates;
@@ -28,14 +23,13 @@ public abstract class Slasher extends Entity{
 	public static final int NOT_JUMP = 0;
 	public static final int INITIAL_SPEED_X = 15;
 	public static final int INITIAL_SPEED_Y = 15;
-	public static final int FLOOR = 30;
 	
 	public Slasher(double x, double y, int direction){
 		super(x, y);
 		this.directionX = direction;
 		this.directionY = NOT_JUMP;
-//		this.height = 
-//		this.width = 
+		this.height = ConfigurableOption.SLASHER_HEIGHT;
+		this.width = ConfigurableOption.SLASHER_WIDTH;
 		//INITIAL_SPEED and accelerationX and accelerationY are just dummy data, we have to discuss soon.
 		this.speedX = INITIAL_SPEED_X;
 		this.speedY = 0;
@@ -68,61 +62,79 @@ public abstract class Slasher extends Entity{
 	}
 	
 	
-	protected void slash(){
-//		if(canSlash()){
-			
-//		}
-		
-		clearStates();
-		states[3] = true;
+	protected void slash(Slasher other){
+		if(canSlash(other)){
+			clearStates();
+			states[3] = true;
+			if(!other.states[6]){
+				other.lives -= 1;
+				other.stun();
+				other.states[6] = true;
+			}
+		}
 	}
 	
 	protected boolean canSlash(Slasher other){
-//		if(direction == DIRECTION_RIGHT && ){
-//			
-//		}
-//		else if(){
-//			
-//		}
-//		We have to know the size of the pictures first.
-		return false;
+		if(!this.states[5] && !this.states[4] && !this.states[2]){
+			//check the direction, too.
+			if(((this.x + ConfigurableOption.HIT_X < other.x + ConfigurableOption.DAMAGE_X &&
+					this.x + ConfigurableOption.HIT_X + ConfigurableOption.HIT_WIDTH < other.x + ConfigurableOption.DAMAGE_X + ConfigurableOption.DAMAGE_WIDTH) ||
+				(other.x + ConfigurableOption.DAMAGE_X < this.x + ConfigurableOption.HIT_X &&
+					this.x + ConfigurableOption.HIT_X + ConfigurableOption.HIT_WIDTH < other.x + ConfigurableOption.DAMAGE_X + ConfigurableOption.DAMAGE_WIDTH) ||
+				(this.x + ConfigurableOption.DAMAGE_X < other.x + ConfigurableOption.HIT_X &&
+					other.x + ConfigurableOption.DAMAGE_X + ConfigurableOption.DAMAGE_WIDTH < this.x + ConfigurableOption.HIT_X + ConfigurableOption.HIT_WIDTH))&&
+				((this.y + ConfigurableOption.HIT_Y < other.y + ConfigurableOption.DAMAGE_Y &&
+					this.y + ConfigurableOption.HIT_Y + ConfigurableOption.HIT_HEIGHT < other.y +ConfigurableOption.DAMAGE_Y + ConfigurableOption.DAMAGE_HEIGHT) || 
+				(other.y + ConfigurableOption.DAMAGE_Y < this.y + ConfigurableOption.HIT_Y &&
+					this.y + ConfigurableOption.HIT_Y + ConfigurableOption.HIT_HEIGHT < other.y + ConfigurableOption.DAMAGE_Y + ConfigurableOption.DAMAGE_HEIGHT) ||
+				(this.y + ConfigurableOption.DAMAGE_Y < other.y + ConfigurableOption.HIT_Y &&
+					other.y + ConfigurableOption.DAMAGE_Y + ConfigurableOption.DAMAGE_HEIGHT < this.y + ConfigurableOption.HIT_Y + ConfigurableOption.HIT_HEIGHT))){
+				
+				return true;
+			}
+			return false;
+		}
+		else{
+			return false;
+		}
 	}
 	
 	protected void jump(){
-		states[4] = true;
+		x += speedX * directionX;
+		if(speedY == 0){
+			directionY = DIRECTION_DOWN;
+			clearStates();
+			states[4] = true;
+		}
+		if(y >= ConfigurableOption.SCREEN_HEIGHT - height - ConfigurableOption.FLOOR){
+			y = ConfigurableOption.SCREEN_HEIGHT - height - ConfigurableOption.FLOOR;
+			directionY = NOT_JUMP;
+			speedY = 0;
+			idle();
+		}
+		else if(y < 0){
+			y = 0;
+			clearStates();
+			states[4] = true;
+		}
+		y += speedY * directionY;
 		directionY = DIRECTION_UP;
 		speedY = INITIAL_SPEED_Y;
 	}
 	
 	protected void run(){
-		if(states[4]){
-			x += speedX * directionX;
-			if(speedY == 0){
-				directionY = DIRECTION_DOWN;
-			}
-			if(y >= 800 - height - 30){
-				y = 800 - height - 30;
-				states[4] = false;
-				directionY = NOT_JUMP;
-				speedY = 0;
-			}
-			else if(y < 0){
-				y = 0;
-			}
-			y += speedY * directionY;
-		}
-		else{
-			x += speedX * directionX;
-			speedX += accelerationX;
-			if(x >= 1500 - width){
-				x = 1500 - width;
-			}
-			else if(x <= 0){
-				x = 0;
-			}
-		}
+		x += speedX * directionX;
+		speedX += accelerationX;
 		clearStates();
-		states[4] = true;
+		states[1] = true;
+		if(x >= ConfigurableOption.SCREEN_WIDTH - width){
+			x = ConfigurableOption.SCREEN_WIDTH - width;
+			idle();
+		}
+		else if(x <= 0){
+			x = 0;
+			idle();
+		}
 	}
 	
 	protected void stun(){
@@ -195,12 +207,13 @@ public abstract class Slasher extends Entity{
 	}
 
 	
-	protected void setIsDead(boolean a){
-		this.isDead = a;
+	protected void setIsDead(){
+		clearStates();
+		this.states[5] = true;
 	}
 	
-	protected boolean getIsDead(boolean a){
-		return isDead;
+	protected boolean getIsDead(){
+		return states[5];
 	}
 
 	

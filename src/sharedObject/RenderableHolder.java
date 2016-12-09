@@ -40,19 +40,19 @@ public class RenderableHolder {
 		yellowBlinkerSheet = new Image(ClassLoader.getSystemResource("yellowBlinkerSheet.png").toString());
 	}
 	
-	public void add(IRenderable entity) {
+	public synchronized void add(IRenderable entity) {
 		entities.add(entity);
 		Collections.sort(entities, comparator);
 	}
 	
-	public void update() {
+	public synchronized void update() {
 		for (int i = entities.size() - 1; i >= 0; i--) {
 			if (entities.get(i).isDestroyed())
 				entities.remove(i);
 		}
 	}
 	
-	public List<IRenderable> getEntities() {
+	public synchronized List<IRenderable> getEntities() {
 		return entities;
 	}
 }

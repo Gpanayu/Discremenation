@@ -3,6 +3,7 @@ package logic;
 import java.util.ArrayList;
 import java.util.List;
 
+import lib.ConfigurableOption;
 import sharedObject.RenderableHolder;
 
 public class GameLogic {
@@ -13,7 +14,6 @@ public class GameLogic {
 	
 	public GameLogic(){
 		this.gameObjectContainer = new ArrayList<Entity>();
-	
 //		Field field = new Field();
 //		RenderableHolder.getInstance().add(field);
 //		tank = new Tank(320,240);
