@@ -27,4 +27,4 @@
 20. ตายที่จังหวะ hp <= 0 พอดี
 21. ปุ่มกดต่างๆ ของplayer1 จะเป็น W,A,D,spacebar(ฟัน),alt(ท่าพิเศษ)    ของplayer2 จะเป็นลูกศรต่างๆ, enter(ฟัน), \(ท่าพิเศษ)
 22. พอเกมเริ่มจะสั่งplayที่ตัวละคร(Blinker) จะset counterของanimtaionเป็น 0 เมื่อstateเปลี่ยนแปลงที่method checkSameStatesของslasher
-23. boolean state ของslasher มีอันดับตามนี้ (0:isIdle, 1:isRun, 2:isStun, , 3: isSlash, 4:isJump, 5:isDead); และ boolean prevStateคือ(0:prevIsIdle,1:prevIsRun, 2:prevIsStun, , 3:prevIsSlash, 4:prevIsJump, 5:prevIsDead);
+23. boolean state ของslasher มีอันดับตามนี้ (0:isIdle, 1:isRun, 2:isStun, , 3: isSlash, 4:isJump, 5:isDead, 6:isImmune); และ boolean prevStateคือ(0:prevIsIdle,1:prevIsRun, 2:prevIsStun, , 3:prevIsSlash, 4:prevIsJump, 5:prevIsDead 6:prevIsImmune);
