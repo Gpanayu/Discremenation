@@ -1,5 +1,7 @@
 package logic;
 
+import lib.ConfigurableOption;
+
 public abstract class Slasher extends Entity{
 	protected int height;
 	protected int width;
@@ -9,7 +11,12 @@ public abstract class Slasher extends Entity{
 	protected int speedY;
 	protected int accelerationX;
 	protected int accelerationY;
+	protected boolean isRun;
+	protected boolean isStun;
+	protected boolean isSlash;
 	protected boolean isJump;
+	protected boolean isDead;
+	protected int lives;
 	
 	public static final int DIRECTION_RIGHT = 1;
 	public static final int DIRECTION_LEFT = -1;
@@ -18,6 +25,7 @@ public abstract class Slasher extends Entity{
 	public static final int NOT_JUMP = 0;
 	public static final int INITIAL_SPEED_X = 15;
 	public static final int INITIAL_SPEED_Y = 15;
+	public static final int FLOOR = 30;
 	
 	public Slasher(double x, double y, int direction){
 		super(x, y);
@@ -99,22 +107,49 @@ public abstract class Slasher extends Entity{
 	protected void setAccelerationY(int accelerationY) {
 		this.accelerationY = accelerationY;
 	}
+	
+	public int getLives() {
+		return lives;
+	}
 
+	protected void setLives(int lives) {
+		this.lives = lives;
+	}
+
+	
+	protected void setIsDead(boolean a){
+		this.isDead = a;
+	}
+	
+	protected boolean getIsDead(boolean a){
+		return isDead;
+	}
 	
 	protected void jump(){
 		isJump = true;
 		directionY = DIRECTION_UP;
-		speedY = INITIAL_SPEED_Y;
+		if(speedX == 0){
+			speedY = INITIAL_SPEED_Y;
+		}
+		else{
+			speedY = speedX;
+		}
 	}
 	
 	protected void move(){
 		if(isJump){
 			x += speedX * directionX;
+			if(x >= ConfigurableOption.SCREEN_WIDTH - width){
+				x = ConfigurableOption.SCREEN_WIDTH - width;
+			}
+			else if(x <= 0){
+				x = 0;
+			}
 			if(speedY == 0){
 				directionY = DIRECTION_DOWN;
 			}
-			if(y >= 800 - height - 30){
-				y = 800 - height - 30;
+			if(y >= ConfigurableOption.SCREEN_HEIGHT - height - FLOOR){
+				y = ConfigurableOption.SCREEN_HEIGHT - height - FLOOR;
 				isJump = false;
 				directionY = NOT_JUMP;
 				speedY = 0;
@@ -135,6 +170,7 @@ public abstract class Slasher extends Entity{
 			}
 		}
 	}
+	
 	
 	protected abstract void useSkill();
 }

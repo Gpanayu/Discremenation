@@ -6,10 +6,10 @@ import javafx.scene.input.KeyCode;
 
 public class InputUtility {
 	
-//	public static double mouseX,mouseY;
-//	public static boolean mouseOnScreen = true;
-//	private static boolean isLeftDown = false;
-//	private static boolean isLeftClickedLastTick = false
+	public static double mouseX,mouseY;
+	public static boolean mouseOnScreen = true;
+	private static boolean isLeftDown = false;
+	private static boolean isLeftClickedLastTick = false;
 
 	private static ArrayList<KeyCode> keyPressed = new ArrayList<>(); 
 	
@@ -27,20 +27,20 @@ public class InputUtility {
 		System.out.println(keyPressed);
 	}
 	
-//	public static void mouseLeftDown(){
-//		isLeftDown = true;
-//		isLeftClickedLastTick = true;
-//	}
-//	
-//	public static void mouseLeftRelease(){
-//		isLeftDown = false;
-//	}
-//	
-//	public static boolean isLeftClickTriggered(){
-//		return isLeftClickedLastTick;
-//	}
-//	
+	public static void mouseLeftDown(){
+		isLeftDown = true;
+		isLeftClickedLastTick = true;
+	}
+	
+	public static void mouseLeftRelease(){
+		isLeftDown = false;
+	}
+	
+	public static boolean isLeftClickTriggered(){
+		return isLeftClickedLastTick;
+	}
+	
 	public static void updateInputState(){
-//		isLeftClickedLastTick = false;
+		isLeftClickedLastTick = false;
 	}
 }
