@@ -19,7 +19,7 @@ public abstract class Slasher extends Entity{
 	public static final int INITIAL_SPEED_X = 15;
 	public static final int INITIAL_SPEED_Y = 15;
 	
-	public Slasher(int x, int y, int direction){
+	public Slasher(double x, double y, int direction){
 		super(x, y);
 		this.directionX = direction;
 		this.directionY = NOT_JUMP;

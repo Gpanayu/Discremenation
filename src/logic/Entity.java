@@ -8,7 +8,7 @@ public abstract class Entity implements IRenderable{
 	protected int z;
 	protected boolean visible,destroyed;
 	
-	protected Entity(int x, int y){
+	protected Entity(double x, double y){
 		this.x = x;
 		this.y = y;
 		visible = true;
