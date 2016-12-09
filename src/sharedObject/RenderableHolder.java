@@ -4,9 +4,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
-
-import com.sun.prism.Image;
-
+import javafx.scene.image.Image;
 import javafx.scene.media.AudioClip;
 
 public class RenderableHolder {
@@ -15,6 +13,9 @@ public class RenderableHolder {
 
 	private List<IRenderable> entities;
 	private Comparator<IRenderable> comparator;
+	public static Image blackBlinkerSheet;
+	public static Image whiteBlinkerSheet;
+	public static Image yellowBlinkerSheet;
 	
 	static {
 		loadResource();
@@ -34,7 +35,9 @@ public class RenderableHolder {
 	}
 	
 	public static void loadResource() {
-		
+		blackBlinkerSheet = new Image(ClassLoader.getSystemResource("blackBlinkerSheet.png").toString());
+		whiteBlinkerSheet = new Image(ClassLoader.getSystemResource("whiteBlinkerSheet.png").toString());
+		yellowBlinkerSheet = new Image(ClassLoader.getSystemResource("yellowBlinkerSheet.png").toString());
 	}
 	
 	public void add(IRenderable entity) {

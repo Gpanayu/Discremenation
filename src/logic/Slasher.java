@@ -17,6 +17,9 @@ public abstract class Slasher extends Entity{
 	protected boolean isJump;
 	protected boolean isDead;
 	protected int lives;
+	protected boolean[] states;
+	protected boolean[] prevStates;
+	
 	
 	public static final int DIRECTION_RIGHT = 1;
 	public static final int DIRECTION_LEFT = -1;
@@ -38,13 +41,40 @@ public abstract class Slasher extends Entity{
 		this.speedY = 0;
 		this.accelerationX = 5;
 		this.accelerationY = 10;
-		this.isJump = false;
+		states = new boolean[10];
+		states[0] = true;
+		states[1] = true;
+		for(int i = 2; i < states.length ; i++){
+			states[i] = false;
+		}
+		prevStates = new boolean[10];
+		prevStates[0] = true;
+		prevStates[1] = true;
+		for(int i = 2; i < prevStates.length ; i++){
+			prevStates[i] = false;
+		}
+		
+		
 	}
+	
+	protected boolean checkSameStates(){
+		for(int i = 0 ; i < states.length ; i++){
+			if (states[i] != prevStates[i]){
+				return false;
+			}
+		}
+		return true;
+		
+	}
+	
 	
 	protected void slash(){
 //		if(canSlash()){
 			
 //		}
+		
+		clearStates();
+		states[3] = true;
 	}
 	
 	protected boolean canSlash(Slasher other){
@@ -58,6 +88,54 @@ public abstract class Slasher extends Entity{
 		return false;
 	}
 	
+	protected void jump(){
+		states[4] = true;
+		directionY = DIRECTION_UP;
+		speedY = INITIAL_SPEED_Y;
+	}
+	
+	protected void run(){
+		if(states[4]){
+			x += speedX * directionX;
+			if(speedY == 0){
+				directionY = DIRECTION_DOWN;
+			}
+			if(y >= 800 - height - 30){
+				y = 800 - height - 30;
+				states[4] = false;
+				directionY = NOT_JUMP;
+				speedY = 0;
+			}
+			else if(y < 0){
+				y = 0;
+			}
+			y += speedY * directionY;
+		}
+		else{
+			x += speedX * directionX;
+			speedX += accelerationX;
+			if(x >= 1500 - width){
+				x = 1500 - width;
+			}
+			else if(x <= 0){
+				x = 0;
+			}
+		}
+		clearStates();
+		states[4] = true;
+	}
+	
+	protected void stun(){
+		//enter stuff here
+		clearStates();
+		states[2] = true;
+	}
+	
+	protected void idle(){
+		//enter stuff here
+		clearStates();
+		states[0] = true;
+	}
 	
 	public int getHeight() {
 		return height;
@@ -124,53 +202,14 @@ public abstract class Slasher extends Entity{
 	protected boolean getIsDead(boolean a){
 		return isDead;
 	}
+
 	
-	protected void jump(){
-		isJump = true;
-		directionY = DIRECTION_UP;
-		if(speedX == 0){
-			speedY = INITIAL_SPEED_Y;
-		}
-		else{
-			speedY = speedX;
+	public void clearStates(){
+		for(int i = 0 ; i <= states.length ; i++){
+			states[i] = false;
 		}
 	}
-	
-	protected void move(){
-		if(isJump){
-			x += speedX * directionX;
-			if(x >= ConfigurableOption.SCREEN_WIDTH - width){
-				x = ConfigurableOption.SCREEN_WIDTH - width;
-			}
-			else if(x <= 0){
-				x = 0;
-			}
-			if(speedY == 0){
-				directionY = DIRECTION_DOWN;
-			}
-			if(y >= ConfigurableOption.SCREEN_HEIGHT - height - FLOOR){
-				y = ConfigurableOption.SCREEN_HEIGHT - height - FLOOR;
-				isJump = false;
-				directionY = NOT_JUMP;
-				speedY = 0;
-			}
-			else if(y < 0){
-				y = 0;
-			}
-			y += speedY * directionY;
-		}
-		else{
-			x += speedX * directionX;
-			speedX += accelerationX;
-			if(x >= 1500 - width){
-				x = 1500 - width;
-			}
-			else if(x <= 0){
-				x = 0;
-			}
-		}
-	}
-	
 	
 	protected abstract void useSkill();
+
 }
