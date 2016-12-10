@@ -13,9 +13,12 @@ public class RenderableHolder {
 
 	private List<IRenderable> entities;
 	private Comparator<IRenderable> comparator;
-	public static Image blackBlinkerSheet;
-	public static Image whiteBlinkerSheet;
-	public static Image yellowBlinkerSheet;
+	public static Image blackRight;
+	public static Image blackLeft;
+	public static Image whiteRight;
+	public static Image whiteLeft;
+	public static Image yellowRight;
+	public static Image yellowLeft;
 	
 	static {
 		loadResource();
@@ -35,9 +38,12 @@ public class RenderableHolder {
 	}
 	
 	public static void loadResource() {
-		blackBlinkerSheet = new Image(ClassLoader.getSystemResource("blackBlinkerSheet.png").toString());
-		whiteBlinkerSheet = new Image(ClassLoader.getSystemResource("whiteBlinkerSheet.png").toString());
-		yellowBlinkerSheet = new Image(ClassLoader.getSystemResource("yellowBlinkerSheet.png").toString());
+		blackRight = new Image(ClassLoader.getSystemResource("BlackRight.png").toString());
+		blackLeft = new Image(ClassLoader.getSystemResource("BlackLeft.png").toString());
+		whiteRight = new Image(ClassLoader.getSystemResource("WhiteRight.png").toString());
+		whiteLeft = new Image(ClassLoader.getSystemResource("WhiteLeft.png").toString());
+		yellowRight = new Image(ClassLoader.getSystemResource("YellowRight.png").toString());
+		yellowLeft = new Image(ClassLoader.getSystemResource("YellowLeft.png").toString());
 	}
 	
 	public synchronized void add(IRenderable entity) {

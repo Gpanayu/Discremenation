@@ -14,7 +14,7 @@ public class GameLogic {
 	private Field field;
 	
 	public GameLogic(){
-		this.gameObjectContainer = new ArrayList<Entity>();
+		GameLogic.gameObjectContainer = new ArrayList<Entity>();
 		
 		field = new Field(ConfigurableOption.firstBackground);
 		RenderableHolder.getInstance().add(field);

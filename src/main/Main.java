@@ -16,44 +16,71 @@ import logic.GameLogic;
 import sharedObject.RenderableHolder;
 
 public class Main extends Application {
+	public static Main instance;
+	private boolean isGameScreen;
+	private GameScreen gameScreen;
+	private Scene gameScene;
+	private WelcomeScreen welcomeScreen;
+	private Scene welcomeScene;
+	private Stage theStage;
+	private GameLogic gameLogic;
+	
 	@Override
 	public void start(Stage primaryStage) {
-		WelcomeScreen welcomeScreen = new WelcomeScreen(ConfigurableOption.SCREEN_WIDTH, ConfigurableOption.SCREEN_HEIGHT);
-		StackPane root = new StackPane();
-		root.getChildren().add(welcomeScreen);
-		Scene scene = new Scene(root);
-		GameLogic logic = new GameLogic();
-		GameScreen gameScreen = new GameScreen(ConfigurableOption.SCREEN_WIDTH, ConfigurableOption.SCREEN_HEIGHT);
-		welcomeScreen.requestFocus();
-		
-		primaryStage.setScene(scene);
-		primaryStage.setTitle("Discremenation");
-		primaryStage.sizeToScene();
-		primaryStage.setResizable(false);
-		primaryStage.setOnCloseRequest(new EventHandler<WindowEvent>() {
+		instance = this;
+		isGameScreen = false;
+		theStage = primaryStage;
+		theStage.setTitle("Discremenation");
+		theStage.setResizable(false);
+		theStage.setOnCloseRequest(new EventHandler<WindowEvent>() {
 			@Override
 			public void handle(WindowEvent event) {
 				System.exit(0);
 			}
 		});
-		primaryStage.show();
 		
-		AnimationTimer animation = new AnimationTimer() {
-			public void handle(long now) {
-				welcomeScreen.paintComponent();
-				logic.logicUpdate();
-//				RenderableHolder.getInstance().update();
-				InputUtility.updateInputState();
-			}
-		};
-		animation.start();
+		StackPane root1 = new StackPane();
+		StackPane root2 = new StackPane();
+		
+		gameScreen = new GameScreen(ConfigurableOption.SCREEN_WIDTH, ConfigurableOption.SCREEN_HEIGHT);
+		welcomeScreen = new WelcomeScreen(ConfigurableOption.SCREEN_WIDTH , ConfigurableOption.SCREEN_HEIGHT);
+		
+		root1.getChildren().add(welcomeScreen);
+		root2.getChildren().add(gameScreen);
+		
+		welcomeScene = new Scene(root1);
+		gameScene = new Scene(root2);
+		
+		theStage.setScene(welcomeScene);
+		theStage.sizeToScene();
+		
+		theStage.show();
 	}
 	
 	public void stop() throws Exception{
 		//stop all threads
 	}
 	
+	public void toggleScene(){
+		if (isGameScreen){
+			theStage.setScene(welcomeScene);
+			this.isGameScreen = false;
+		}else{
+			theStage.setScene(gameScene);
+			this.isGameScreen = true;
+		}
+	}
+	
+	public Stage getTheStage(){
+		return theStage;
+	}
+	
+	public void drawGameScreen(){
+		gameScreen.paintComponent();
+	}
+
 	public static void main(String[] args) {
 		launch(args);
 	}
+
 }

@@ -7,19 +7,31 @@ import javafx.scene.input.KeyCode;
 import javafx.scene.input.KeyEvent;
 import javafx.scene.input.MouseButton;
 import javafx.scene.input.MouseEvent;
+import javafx.scene.layout.Pane;
 import javafx.scene.paint.Color;
+import lib.ConfigurableOption;
+import logic.GameLogic;
+import logic.GameLoopUtility;
+import main.Main;
 import sharedObject.IRenderable;
 import sharedObject.RenderableHolder;
 
-public class GameScreen extends Canvas{
+public class GameScreen extends Pane{
+	private Canvas canvas;
+	private GameLogic logic;
+	private GameLoopUtility gameLoopUtility;
 
 	public GameScreen(double width, double height) {
-		super(width, height);
-		this.setVisible(true);
-		addListerner();
+		super();
+		canvas = new Canvas(ConfigurableOption.SCREEN_WIDTH, ConfigurableOption.SCREEN_HEIGHT);
+		this.getChildren().add(canvas);
+		addListener();
+		this.canvas.setOnMouseClicked((event) -> {
+			Main.instance.toggleScene();
+		});
 	}
-	public void addListerner() {
-		this.setOnKeyPressed((KeyEvent event) -> {
+	public void addListener() {
+		this.canvas.setOnKeyPressed((KeyEvent event) -> {
 			if(event.getCode() != KeyCode.W && event.getCode() != KeyCode.A && event.getCode() != KeyCode.D
 					&& event.getCode() != KeyCode.ALT && event.getCode() != KeyCode.SPACE
 					&& event.getCode() != KeyCode.LEFT && event.getCode() != KeyCode.UP
@@ -32,7 +44,7 @@ public class GameScreen extends Canvas{
 			InputUtility.setKeyPressed(event.getCode(), true);
 		});
 
-		this.setOnKeyReleased((KeyEvent event) -> {
+		this.canvas.setOnKeyReleased((KeyEvent event) -> {
 			if(event.getCode() != KeyCode.W && event.getCode() != KeyCode.A && event.getCode() != KeyCode.D
 					&& event.getCode() != KeyCode.ALT && event.getCode() != KeyCode.SPACE
 					&& event.getCode() != KeyCode.LEFT && event.getCode() != KeyCode.UP
@@ -45,27 +57,28 @@ public class GameScreen extends Canvas{
 			InputUtility.setKeyPressed(event.getCode(), false);
 		});
 
-		this.setOnMousePressed((MouseEvent event) -> {
+		this.canvas.setOnMousePressed((MouseEvent event) -> {
 			if (event.getButton() == MouseButton.PRIMARY)
 				InputUtility.mouseLeftDown();
 		});
 
-		this.setOnMouseReleased((MouseEvent event) -> {
+		this.canvas.setOnMouseReleased((MouseEvent event) -> {
 			if (event.getButton() == MouseButton.PRIMARY)
 				InputUtility.mouseLeftRelease();
 		});
 
-		this.setOnMouseEntered((MouseEvent event) -> {
+		this.canvas.setOnMouseEntered((MouseEvent event) -> {
 			InputUtility.mouseOnScreen = true;
 		});
 
-		this.setOnMouseExited((MouseEvent event) -> {
+		this.canvas.setOnMouseExited((MouseEvent event) -> {
 			InputUtility.mouseOnScreen = false;
 		});
 	}
 	
 	public void paintComponent() {
-		GraphicsContext gc = this.getGraphicsContext2D();
+		GraphicsContext gc = canvas.getGraphicsContext2D();
+		gc.clearRect(0, 0, ConfigurableOption.SCREEN_WIDTH, ConfigurableOption.SCREEN_HEIGHT);
 		gc.setFill(Color.BLACK);
 		for (IRenderable entity : RenderableHolder.getInstance().getEntities()) {
 			if (entity.isVisible() && !entity.isDestroyed()) {
