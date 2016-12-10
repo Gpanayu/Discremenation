@@ -7,30 +7,44 @@ import lib.ConfigurableOption;
 import sharedObject.RenderableHolder;
 
 public class GameLogic {
-	private List<Entity> gameObjectContainer;
+	private static List<Entity> gameObjectContainer;
 	
-//	private Tank tank;
-//	private Mine mine;
+	private static Slasher player1;
+	private static Slasher player2;
+	private Field field;
 	
 	public GameLogic(){
 		this.gameObjectContainer = new ArrayList<Entity>();
-//		Field field = new Field();
-//		RenderableHolder.getInstance().add(field);
-//		tank = new Tank(320,240);
-//		mine = new Mine(100,100);
-//		addNewObject(tank);
-//		addNewObject(mine);
+		
+		field = new Field(ConfigurableOption.firstBackground);
+		RenderableHolder.getInstance().add(field);
+		//Set player1 be white and player2 be black.
+		player1 = new Blinker(5, 300, Slasher.DIRECTION_RIGHT, false);
+		addNewObject(player1);
+		player2 = new Blinker(500, 300, Slasher.DIRECTION_LEFT, true);
+		addNewObject(player2);
 	}
 	
+	public static Slasher getPlayer1() {
+		return player1;
+	}
+
+	public static Slasher getPlayer2() {
+		return player2;
+	}
+
 	protected void addNewObject(Entity entity){
 		gameObjectContainer.add(entity);
 		RenderableHolder.getInstance().add(entity);
 	}
 	
 	public void logicUpdate(){
-//		tank.update();
-//		if(!mine.isDestroyed() && tank.collideWith(mine)){
-//			mine.onCollision(tank);
-//		}
+		field.updateField();
+		player1.update();
+		player2.update();
+	}
+	
+	public static List<Entity> getGameObjectContainer(){
+		return gameObjectContainer;
 	}
 }

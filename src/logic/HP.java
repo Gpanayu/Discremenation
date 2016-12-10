@@ -24,6 +24,18 @@ public class HP extends Entity {
 			this.slasher.setIsDead();
 		}
 	}
+	
+	public double getHPValue() {
+		return HPValue;
+	}
+
+	public Color getHPColor() {
+		return HPColor;
+	}
+
+	public Slasher getSlasher() {
+		return slasher;
+	}
 
 	@Override
 	public void draw(GraphicsContext gc) {

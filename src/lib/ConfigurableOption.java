@@ -1,5 +1,7 @@
 package lib;
 
+import javafx.scene.image.Image;
+
 public class ConfigurableOption {
 	public static final int SCREEN_WIDTH = 1500 * 3 / 4;
 	public static final int SCREEN_HEIGHT = 800 * 3 / 4;
@@ -14,5 +16,9 @@ public class ConfigurableOption {
 	public static final int FLOOR = 30;
 	public static final int SLASHER_WIDTH = 550;
 	public static final int SLASHER_HEIGHT = 400;
-
+	public static Image firstBackground = new Image(ClassLoader.getSystemResource("bg.png").toString());
+	  
+	public static void setBackground(String source){
+		firstBackground = new Image(ClassLoader.getSystemResource(source).toString());
+	}
 }

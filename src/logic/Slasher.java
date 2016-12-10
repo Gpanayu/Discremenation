@@ -1,5 +1,8 @@
 package logic;
 
+import input.InputUtility;
+import javafx.scene.input.KeyCode;
+import javafx.scene.paint.Color;
 import lib.ConfigurableOption;
 
 public abstract class Slasher extends Entity{
@@ -11,10 +14,16 @@ public abstract class Slasher extends Entity{
 	protected int speedY;
 	protected int accelerationX;
 	protected int accelerationY;
-	protected int lives;
 	protected boolean[] states;
 	protected boolean[] prevStates;
+	protected HP hp;
+	protected Gauge gauge;
 	
+	protected int counter;
+	protected int immuneCounter;
+	protected int slashTime;
+	protected int stunTime;
+	protected int immuneTime;
 	
 	public static final int DIRECTION_RIGHT = 1;
 	public static final int DIRECTION_LEFT = -1;
@@ -47,7 +56,8 @@ public abstract class Slasher extends Entity{
 		for(int i = 2; i < prevStates.length ; i++){
 			prevStates[i] = false;
 		}
-		
+		counter = 0;
+		immuneCounter = 0;
 		
 	}
 	
@@ -63,36 +73,55 @@ public abstract class Slasher extends Entity{
 	
 	
 	protected void slash(Slasher other){
-		if(canSlash(other)){
-			clearStates();
-			states[3] = true;
-			if(!other.states[6]){
-				other.lives -= 1;
-				other.stun();
-				other.states[6] = true;
-			}
+		clearStates();
+		states[3] = true;
+		if(canSlash(other) && !other.states[6]){
+			other.hp.decreaseHP(1);
+			other.gauge.increaseGauge(1);
+			other.stun();
+			other.states[6] = true;
 		}
 	}
 	
 	protected boolean canSlash(Slasher other){
 		if(!this.states[5] && !this.states[4] && !this.states[2]){
-			//check the direction, too.
-			if(((this.x + ConfigurableOption.HIT_X < other.x + ConfigurableOption.DAMAGE_X &&
-					this.x + ConfigurableOption.HIT_X + ConfigurableOption.HIT_WIDTH < other.x + ConfigurableOption.DAMAGE_X + ConfigurableOption.DAMAGE_WIDTH) ||
-				(other.x + ConfigurableOption.DAMAGE_X < this.x + ConfigurableOption.HIT_X &&
-					this.x + ConfigurableOption.HIT_X + ConfigurableOption.HIT_WIDTH < other.x + ConfigurableOption.DAMAGE_X + ConfigurableOption.DAMAGE_WIDTH) ||
-				(this.x + ConfigurableOption.DAMAGE_X < other.x + ConfigurableOption.HIT_X &&
-					other.x + ConfigurableOption.DAMAGE_X + ConfigurableOption.DAMAGE_WIDTH < this.x + ConfigurableOption.HIT_X + ConfigurableOption.HIT_WIDTH))&&
-				((this.y + ConfigurableOption.HIT_Y < other.y + ConfigurableOption.DAMAGE_Y &&
-					this.y + ConfigurableOption.HIT_Y + ConfigurableOption.HIT_HEIGHT < other.y +ConfigurableOption.DAMAGE_Y + ConfigurableOption.DAMAGE_HEIGHT) || 
-				(other.y + ConfigurableOption.DAMAGE_Y < this.y + ConfigurableOption.HIT_Y &&
-					this.y + ConfigurableOption.HIT_Y + ConfigurableOption.HIT_HEIGHT < other.y + ConfigurableOption.DAMAGE_Y + ConfigurableOption.DAMAGE_HEIGHT) ||
-				(this.y + ConfigurableOption.DAMAGE_Y < other.y + ConfigurableOption.HIT_Y &&
-					other.y + ConfigurableOption.DAMAGE_Y + ConfigurableOption.DAMAGE_HEIGHT < this.y + ConfigurableOption.HIT_Y + ConfigurableOption.HIT_HEIGHT))){
+			if(this.directionX == Slasher.DIRECTION_RIGHT){
+				if(((this.x + ConfigurableOption.HIT_X < other.x + ConfigurableOption.DAMAGE_X &&
+						this.x + ConfigurableOption.HIT_X + ConfigurableOption.HIT_WIDTH < other.x + ConfigurableOption.DAMAGE_X + ConfigurableOption.DAMAGE_WIDTH) ||
+					(other.x + ConfigurableOption.DAMAGE_X < this.x + ConfigurableOption.HIT_X &&
+						this.x + ConfigurableOption.HIT_X + ConfigurableOption.HIT_WIDTH < other.x + ConfigurableOption.DAMAGE_X + ConfigurableOption.DAMAGE_WIDTH) ||
+					(this.x + ConfigurableOption.DAMAGE_X < other.x + ConfigurableOption.HIT_X &&
+						other.x + ConfigurableOption.DAMAGE_X + ConfigurableOption.DAMAGE_WIDTH < this.x + ConfigurableOption.HIT_X + ConfigurableOption.HIT_WIDTH))&&
+					((this.y + ConfigurableOption.HIT_Y < other.y + ConfigurableOption.DAMAGE_Y &&
+						this.y + ConfigurableOption.HIT_Y + ConfigurableOption.HIT_HEIGHT < other.y +ConfigurableOption.DAMAGE_Y + ConfigurableOption.DAMAGE_HEIGHT) || 
+						(other.y + ConfigurableOption.DAMAGE_Y < this.y + ConfigurableOption.HIT_Y &&
+						this.y + ConfigurableOption.HIT_Y + ConfigurableOption.HIT_HEIGHT < other.y + ConfigurableOption.DAMAGE_Y + ConfigurableOption.DAMAGE_HEIGHT) ||
+					(this.y + ConfigurableOption.DAMAGE_Y < other.y + ConfigurableOption.HIT_Y &&
+						other.y + ConfigurableOption.DAMAGE_Y + ConfigurableOption.DAMAGE_HEIGHT < this.y + ConfigurableOption.HIT_Y + ConfigurableOption.HIT_HEIGHT))){
 				
-				return true;
+					return true;
+				}
+				return false;
 			}
-			return false;
+			else{
+				if(((this.x + ConfigurableOption.HIT_X < other.x + ConfigurableOption.DAMAGE_X - ConfigurableOption.HIT_WIDTH - ConfigurableOption.DAMAGE_WIDTH &&
+						this.x + ConfigurableOption.HIT_X + ConfigurableOption.HIT_WIDTH < other.x + ConfigurableOption.DAMAGE_X - ConfigurableOption.HIT_WIDTH) ||
+					(other.x + ConfigurableOption.DAMAGE_X - ConfigurableOption.HIT_WIDTH - ConfigurableOption.DAMAGE_WIDTH < this.x + ConfigurableOption.HIT_X &&
+						this.x + ConfigurableOption.HIT_X + ConfigurableOption.HIT_WIDTH < other.x + ConfigurableOption.DAMAGE_X - ConfigurableOption.HIT_WIDTH) ||
+					(this.x + ConfigurableOption.DAMAGE_X - ConfigurableOption.HIT_WIDTH - ConfigurableOption.DAMAGE_WIDTH < other.x + ConfigurableOption.HIT_X &&
+						other.x + ConfigurableOption.DAMAGE_X + ConfigurableOption.HIT_WIDTH < this.x + ConfigurableOption.HIT_X + ConfigurableOption.HIT_WIDTH))&&
+					((this.y + ConfigurableOption.HIT_Y < other.y + ConfigurableOption.DAMAGE_Y &&
+						this.y + ConfigurableOption.HIT_Y + ConfigurableOption.HIT_HEIGHT < other.y +ConfigurableOption.DAMAGE_Y + ConfigurableOption.DAMAGE_HEIGHT) || 
+						(other.y + ConfigurableOption.DAMAGE_Y < this.y + ConfigurableOption.HIT_Y &&
+						this.y + ConfigurableOption.HIT_Y + ConfigurableOption.HIT_HEIGHT < other.y + ConfigurableOption.DAMAGE_Y + ConfigurableOption.DAMAGE_HEIGHT) ||
+					(this.y + ConfigurableOption.DAMAGE_Y < other.y + ConfigurableOption.HIT_Y &&
+						other.y + ConfigurableOption.DAMAGE_Y + ConfigurableOption.DAMAGE_HEIGHT < this.y + ConfigurableOption.HIT_Y + ConfigurableOption.HIT_HEIGHT))){
+				
+					return true;
+				}
+				return false;
+				
+			}
 		}
 		else{
 			return false;
@@ -100,26 +129,32 @@ public abstract class Slasher extends Entity{
 	}
 	
 	protected void jump(){
-		x += speedX * directionX;
-		if(speedY == 0){
-			directionY = DIRECTION_DOWN;
-			clearStates();
-			states[4] = true;
+		if(!prevStates[4]){
+			x += speedX * directionX;
+			speedY = INITIAL_SPEED_Y;
+			directionY = DIRECTION_UP;
+			y += speedY * directionY;
 		}
-		if(y >= ConfigurableOption.SCREEN_HEIGHT - height - ConfigurableOption.FLOOR){
-			y = ConfigurableOption.SCREEN_HEIGHT - height - ConfigurableOption.FLOOR;
-			directionY = NOT_JUMP;
-			speedY = 0;
-			idle();
+		else{
+			x += speedX * directionX;
+			if(speedY == 0){
+				directionY = DIRECTION_DOWN;
+				clearStates();
+				states[4] = true;
+			}
+			if(y >= ConfigurableOption.SCREEN_HEIGHT - height - ConfigurableOption.FLOOR){
+				y = ConfigurableOption.SCREEN_HEIGHT - height - ConfigurableOption.FLOOR;
+				directionY = NOT_JUMP;
+				speedY = 0;
+				idle();
+			}
+			else if(y < 0){
+				y = 0;
+				clearStates();
+				states[4] = true;
+			}
+			y += speedY * directionY;
 		}
-		else if(y < 0){
-			y = 0;
-			clearStates();
-			states[4] = true;
-		}
-		y += speedY * directionY;
-		directionY = DIRECTION_UP;
-		speedY = INITIAL_SPEED_Y;
 	}
 	
 	protected void run(){
@@ -138,13 +173,23 @@ public abstract class Slasher extends Entity{
 	}
 	
 	protected void stun(){
-		//enter stuff here
+		if(!prevStates[2]){
+			for(Entity e : GameLogic.getGameObjectContainer()){
+				if(e instanceof Slasher && !e.equals(this)){
+					Blinker b = (Blinker)e;
+					this.directionX = -b.directionX;
+					speedX = INITIAL_SPEED_X;
+				}
+			}
+		}
+		x += speedX * (-directionX);
 		clearStates();
 		states[2] = true;
 	}
 	
 	protected void idle(){
-		//enter stuff here
+		speedX = 0;
+		speedY = 0;
 		clearStates();
 		states[0] = true;
 	}
@@ -197,15 +242,67 @@ public abstract class Slasher extends Entity{
 	protected void setAccelerationY(int accelerationY) {
 		this.accelerationY = accelerationY;
 	}
-	
-	public int getLives() {
-		return lives;
-	}
 
-	protected void setLives(int lives) {
-		this.lives = lives;
+	protected void update(){
+		if(this instanceof Blinker){
+			Blinker b = (Blinker)(this);
+			b.updateAnimation();
+			if(prevStates[2]){
+				counter += 1;
+				if(counter == stunTime){
+					idle();
+					counter = 0;
+				}
+			}
+			else if(prevStates[3]){
+				counter += 1;
+				if(counter == slashTime){
+					idle();
+					counter = 0;
+				}
+			}
+			if(prevStates[6]){
+				immuneCounter += 1;
+				if(immuneCounter == immuneTime){
+					states[6] = false;
+					immuneCounter = 0;
+				}
+			}
+			if((InputUtility.getKeyPressed(KeyCode.W) && !b.isBlack()) || (InputUtility.getKeyPressed(KeyCode.UP) && b.isBlack())){
+				b.jump();
+			}
+			else if((InputUtility.getKeyPressed(KeyCode.A) && !b.isBlack()) || (InputUtility.getKeyPressed(KeyCode.LEFT) && b.isBlack())){
+				if(directionX != Slasher.DIRECTION_LEFT){
+					directionX = Slasher.DIRECTION_LEFT;
+					idle();
+				}
+				else{
+					run();
+					counter = 0;
+				}
+			}
+			else if((InputUtility.getKeyPressed(KeyCode.D) && !b.isBlack()) || (InputUtility.getKeyPressed(KeyCode.RIGHT) && b.isBlack())){
+				if(directionX != Slasher.DIRECTION_RIGHT){
+					directionX = Slasher.DIRECTION_RIGHT;
+					idle();
+				}
+				else{
+					run();
+					counter = 0;
+				}
+			}
+			else if(InputUtility.getKeyPressed(KeyCode.SPACE) && !b.isBlack()){
+				b.slash(GameLogic.getPlayer2());
+			}
+			else if(InputUtility.getKeyPressed(KeyCode.ENTER) && b.isBlack()){
+				b.slash(GameLogic.getPlayer1());
+			}
+			else if((InputUtility.getKeyPressed(KeyCode.ALT) && !b.isBlack()) || (InputUtility.getKeyPressed(KeyCode.BACK_SLASH) && b.isBlack())){
+				// use special power
+			}
+		}
+		prevStates = states;
 	}
-
 	
 	protected void setIsDead(){
 		clearStates();
@@ -218,7 +315,7 @@ public abstract class Slasher extends Entity{
 
 	
 	public void clearStates(){
-		for(int i = 0 ; i <= states.length ; i++){
+		for(int i = 0 ; i <= 5 ; i++){
 			states[i] = false;
 		}
 	}
