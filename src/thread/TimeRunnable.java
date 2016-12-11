@@ -5,12 +5,12 @@ public class TimeRunnable implements Runnable{
 	@Override
 	public void run() {
 		// TODO Auto-generated method stub
-		int currentTime = 0;
+		int currentTime = 60;
 		// We need to add the condition when the game is over, it will stop counting.
 		while(true){//This needs to be edited.
 			try {
 				Thread.sleep(1000);
-				currentTime ++;
+				currentTime --;
 				
 				//draw this timer, too.
 				

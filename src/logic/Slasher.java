@@ -1,5 +1,13 @@
 package logic;
 
+import drawing.WelcomeScreen;
+import input.InputUtility;
+import javafx.scene.input.KeyCode;
+import javafx.scene.paint.Color;
+import lib.ConfigurableOption;
+import main.Main;
+import sharedObject.RenderableHolder;
+
 public abstract class Slasher extends Entity{
 	protected int height;
 	protected int width;
@@ -11,8 +19,16 @@ public abstract class Slasher extends Entity{
 	protected int accelerationY;
 	protected boolean[] states;
 	protected boolean[] prevStates;
+	protected boolean isImmune; //changed
+	protected HP hp;
+	protected Gauge gauge;
 	
-	
+	protected int counter;
+	protected int runTime;
+	protected int immuneCounter;
+	protected int slashTime;
+	protected int stunTime;
+	protected int immuneTime;
 	
 	public static final int DIRECTION_RIGHT = 1;
 	public static final int DIRECTION_LEFT = -1;
@@ -22,12 +38,15 @@ public abstract class Slasher extends Entity{
 	public static final int INITIAL_SPEED_X = 15;
 	public static final int INITIAL_SPEED_Y = 15;
 	
-	public Slasher(int x, int y, int direction){
+	protected boolean canMove = true; //changed
+	
+	public Slasher(double x, double y, int direction){
 		super(x, y);
+		this.isImmune = false; // changed
 		this.directionX = direction;
 		this.directionY = NOT_JUMP;
-//		this.height = 
-//		this.width = 
+		this.height = ConfigurableOption.SLASHER_HEIGHT;
+		this.width = ConfigurableOption.SLASHER_WIDTH;
 		//INITIAL_SPEED and accelerationX and accelerationY are just dummy data, we have to discuss soon.
 		this.speedX = INITIAL_SPEED_X;
 		this.speedY = 0;
@@ -35,17 +54,17 @@ public abstract class Slasher extends Entity{
 		this.accelerationY = 10;
 		states = new boolean[10];
 		states[0] = true;
-		states[1] = true;
 		for(int i = 2; i < states.length ; i++){
 			states[i] = false;
 		}
 		prevStates = new boolean[10];
 		prevStates[0] = true;
-		prevStates[1] = true;
 		for(int i = 2; i < prevStates.length ; i++){
 			prevStates[i] = false;
 		}
-		
+		counter = 0;
+		immuneCounter = 0;
+	
 		
 	}
 	
@@ -59,70 +78,145 @@ public abstract class Slasher extends Entity{
 		
 	}
 	
-	protected void slash(){
-//		if(canSlash()){
-			
-//		}
+	
+	protected void slash(Slasher other){
 		clearStates();
 		states[3] = true;
+		if(canSlash(other) && !other.states[6]){
+			other.hp.decreaseHP(1);
+			other.gauge.increaseGauge(1);
+			other.stun();
+			other.states[6] = true;
+		}
+		this.canMove = false; //changed
 	}
 	
 	protected boolean canSlash(Slasher other){
-//		if(direction == DIRECTION_RIGHT && ){
-//			
-//		}
-//		else if(){
-//			
-//		}
-//		We have to know the size of the pictures first.
-		return false;
+		if(!this.states[5] && !this.states[4] && !this.states[2]){
+			if(this.directionX == Slasher.DIRECTION_RIGHT){
+				if(((this.x + ConfigurableOption.HIT_X < other.x + ConfigurableOption.DAMAGE_X &&
+						this.x + ConfigurableOption.HIT_X + ConfigurableOption.HIT_WIDTH < other.x + ConfigurableOption.DAMAGE_X + ConfigurableOption.DAMAGE_WIDTH) ||
+					(other.x + ConfigurableOption.DAMAGE_X < this.x + ConfigurableOption.HIT_X &&
+						this.x + ConfigurableOption.HIT_X + ConfigurableOption.HIT_WIDTH < other.x + ConfigurableOption.DAMAGE_X + ConfigurableOption.DAMAGE_WIDTH) ||
+					(this.x + ConfigurableOption.DAMAGE_X < other.x + ConfigurableOption.HIT_X &&
+						other.x + ConfigurableOption.DAMAGE_X + ConfigurableOption.DAMAGE_WIDTH < this.x + ConfigurableOption.HIT_X + ConfigurableOption.HIT_WIDTH))&&
+					((this.y + ConfigurableOption.HIT_Y < other.y + ConfigurableOption.DAMAGE_Y &&
+						this.y + ConfigurableOption.HIT_Y + ConfigurableOption.HIT_HEIGHT < other.y +ConfigurableOption.DAMAGE_Y + ConfigurableOption.DAMAGE_HEIGHT) || 
+						(other.y + ConfigurableOption.DAMAGE_Y < this.y + ConfigurableOption.HIT_Y &&
+						this.y + ConfigurableOption.HIT_Y + ConfigurableOption.HIT_HEIGHT < other.y + ConfigurableOption.DAMAGE_Y + ConfigurableOption.DAMAGE_HEIGHT) ||
+					(this.y + ConfigurableOption.DAMAGE_Y < other.y + ConfigurableOption.HIT_Y &&
+						other.y + ConfigurableOption.DAMAGE_Y + ConfigurableOption.DAMAGE_HEIGHT < this.y + ConfigurableOption.HIT_Y + ConfigurableOption.HIT_HEIGHT))){
+				
+					return true;
+				}
+				return false;
+			}
+			else{
+				if(((this.x + ConfigurableOption.HIT_X < other.x + ConfigurableOption.DAMAGE_X - ConfigurableOption.HIT_WIDTH - ConfigurableOption.DAMAGE_WIDTH &&
+						this.x + ConfigurableOption.HIT_X + ConfigurableOption.HIT_WIDTH < other.x + ConfigurableOption.DAMAGE_X - ConfigurableOption.HIT_WIDTH) ||
+					(other.x + ConfigurableOption.DAMAGE_X - ConfigurableOption.HIT_WIDTH - ConfigurableOption.DAMAGE_WIDTH < this.x + ConfigurableOption.HIT_X &&
+						this.x + ConfigurableOption.HIT_X + ConfigurableOption.HIT_WIDTH < other.x + ConfigurableOption.DAMAGE_X - ConfigurableOption.HIT_WIDTH) ||
+					(this.x + ConfigurableOption.DAMAGE_X - ConfigurableOption.HIT_WIDTH - ConfigurableOption.DAMAGE_WIDTH < other.x + ConfigurableOption.HIT_X &&
+						other.x + ConfigurableOption.DAMAGE_X + ConfigurableOption.HIT_WIDTH < this.x + ConfigurableOption.HIT_X + ConfigurableOption.HIT_WIDTH))&&
+					((this.y + ConfigurableOption.HIT_Y < other.y + ConfigurableOption.DAMAGE_Y &&
+						this.y + ConfigurableOption.HIT_Y + ConfigurableOption.HIT_HEIGHT < other.y +ConfigurableOption.DAMAGE_Y + ConfigurableOption.DAMAGE_HEIGHT) || 
+						(other.y + ConfigurableOption.DAMAGE_Y < this.y + ConfigurableOption.HIT_Y &&
+						this.y + ConfigurableOption.HIT_Y + ConfigurableOption.HIT_HEIGHT < other.y + ConfigurableOption.DAMAGE_Y + ConfigurableOption.DAMAGE_HEIGHT) ||
+					(this.y + ConfigurableOption.DAMAGE_Y < other.y + ConfigurableOption.HIT_Y &&
+						other.y + ConfigurableOption.DAMAGE_Y + ConfigurableOption.DAMAGE_HEIGHT < this.y + ConfigurableOption.HIT_Y + ConfigurableOption.HIT_HEIGHT))){
+				
+					return true;
+				}
+				return false;
+				
+			}
+		}
+		else{
+			return false;
+		}
 	}
 	
 	protected void jump(){
-		states[4] = true;
-		directionY = DIRECTION_UP;
-		speedY = INITIAL_SPEED_Y;
-	}
-	
-	protected void run(){
-		if(states[4]){
+		if(prevStates[1]){
 			x += speedX * directionX;
-			if(speedY == 0){
-				directionY = DIRECTION_DOWN;
-			}
-			if(y >= 800 - height - 30){
-				y = 800 - height - 30;
-				states[4] = false;
-				directionY = NOT_JUMP;
-				speedY = 0;
-			}
-			else if(y < 0){
-				y = 0;
-			}
+			speedY = speedX;
+			directionY = DIRECTION_UP;
 			y += speedY * directionY;
+			clearStates();
+			states[4] = true;
+			this.canMove = false;
+		}
+		else if(prevStates[0]){
+			speedY = INITIAL_SPEED_Y;
+			directionY = DIRECTION_UP;
+			y += speedY * directionY;
+			clearStates();
+			states[4] = true;
+			this.canMove = false;
 		}
 		else{
 			x += speedX * directionX;
-			speedX += accelerationX;
-			if(x >= 1500 - width){
-				x = 1500 - width;
+			y += speedY * directionY;
+			if(speedY == 0){
+				directionY = DIRECTION_DOWN;
+				clearStates();
+				states[4] = true;
+				this.canMove = false;
 			}
-			else if(x <= 0){
-				x = 0;
+			if(y >= ConfigurableOption.SCREEN_HEIGHT - height - ConfigurableOption.FLOOR){
+				y = ConfigurableOption.SCREEN_HEIGHT - height - ConfigurableOption.FLOOR;
+				directionY = NOT_JUMP;
+				speedY = 0;
+				idle();
+				this.canMove = true;
+			}
+			else if(y < 0){
+				y = 0;
+				clearStates();
+				states[4] = true;
+				this.canMove = false;
 			}
 		}
+	}
+	
+	protected void run(){
+		if(!prevStates[1]){
+			speedX = INITIAL_SPEED_X;
+		}
+		x += speedX * directionX;
+		speedX += accelerationX;
 		clearStates();
-		states[4] = true;
+		states[1] = true;
+		if(x >= ConfigurableOption.SCREEN_WIDTH - width){
+			x = ConfigurableOption.SCREEN_WIDTH - width;
+			idle();
+		}
+		else if(x <= 0){
+			x = 0;
+			idle();
+		}
 	}
 	
 	protected void stun(){
-		//enter stuff here
+		if(!prevStates[2]){
+			for(Entity e : GameLogic.getGameObjectContainer()){
+				if(e instanceof Slasher && !e.equals(this)){
+					Blinker b = (Blinker)e;
+					this.directionX = -b.directionX;
+					speedX = INITIAL_SPEED_X;
+					this.isImmune = true;
+				}
+			}
+		}
+		x += speedX * (-directionX);
 		clearStates();
 		states[2] = true;
+		this.canMove = false; // change
 	}
 	
 	protected void idle(){
-		//enter stuff here
+		speedX = 0;
+		speedY = 0;
 		clearStates();
 		states[0] = true;
 	}
@@ -175,26 +269,90 @@ public abstract class Slasher extends Entity{
 	protected void setAccelerationY(int accelerationY) {
 		this.accelerationY = accelerationY;
 	}
+
+	protected void update(){
+		if(this instanceof Blinker){
+			Blinker b = (Blinker)(this);
+			b.updateAnimation();
+			if(prevStates[2]){
+				counter += 1;
+				if(counter == stunTime){
+					this.canMove = true; // change
+					idle();
+					counter = 0;
+				}
+			}
+			else if(prevStates[3]){
+				counter += 1;
+				if(counter == slashTime){
+					this.canMove = true;
+					idle();
+					counter = 0;
+				}
+			}
+			if(this.isImmune){
+				immuneCounter += 1;
+				if(immuneCounter == immuneTime){
+					this.isImmune = false;
+					immuneCounter = 0;
+				}
+			}
+			if(((InputUtility.getKeyPressed(KeyCode.W) && !b.isBlack()) || (InputUtility.getKeyPressed(KeyCode.UP) && b.isBlack())) && b.canMove || b.prevStates[4]){// change
+				b.jump();
+			}
+			else if(((InputUtility.getKeyPressed(KeyCode.A) && !b.isBlack()) || (InputUtility.getKeyPressed(KeyCode.LEFT) && b.isBlack())) && b.canMove){ // change
+				if(directionX != Slasher.DIRECTION_LEFT){
+					directionX = Slasher.DIRECTION_LEFT;
+					idle();
+				}
+				else{
+					run();
+					counter = 0;
+				}
+			}
+			else if(((InputUtility.getKeyPressed(KeyCode.D) && !b.isBlack()) || (InputUtility.getKeyPressed(KeyCode.RIGHT) && b.isBlack())) && b.canMove){ // change
+				if(directionX != Slasher.DIRECTION_RIGHT){
+					directionX = Slasher.DIRECTION_RIGHT;
+					idle();
+				}
+				else{
+					run();
+					counter = 0;
+				}
+			}
+			else if(InputUtility.getKeyPressed(KeyCode.SPACE) && !b.isBlack() && b.canMove || prevStates[3]){ // change
+				b.slash(GameLogic.getPlayer2());
+				
+			}
+			else if(InputUtility.getKeyPressed(KeyCode.ENTER) && b.isBlack() && b.canMove){ // change
+				b.slash(GameLogic.getPlayer1());
+			}
+			else if(((InputUtility.getKeyPressed(KeyCode.ALT) && !b.isBlack()) || (InputUtility.getKeyPressed(KeyCode.BACK_SLASH) && b.isBlack())) && b.canMove){ // change
+				// use special power
+			}
+			else{
+				idle();
+			}
+		}
+		prevStates = states;
+	}
 	
-	protected void setIsDead(boolean a){
+	protected void setIsDead(){
 		clearStates();
 		this.states[5] = true;
 	}
 	
-	protected boolean getIsDead(boolean a){
+	protected boolean getIsDead(){
 		return states[5];
 	}
 
 	
-
-	public void draw(){
-	}
-			
 	public void clearStates(){
-		for(int i = 0 ; i <= states.length ; i++){
+		for(int i = 0 ; i <= 5 ; i++){
 			states[i] = false;
 		}
 	}
 	
 	protected abstract void useSkill();
+
 }

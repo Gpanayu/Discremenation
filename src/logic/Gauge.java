@@ -2,6 +2,7 @@ package logic;
 
 import javafx.scene.canvas.GraphicsContext;
 import javafx.scene.paint.Color;
+import thread.PowerGauge;
 
 public class Gauge extends Entity{
 	private Color gaugeColor;
@@ -12,11 +13,14 @@ public class Gauge extends Entity{
 	public Gauge(double x, double y, Color color, Slasher slasher){
 		super(x,y);
 		this.gaugeColor = color;
-		this.gaugeMax = 100;
+		this.gaugeMax = 500;
 		this.slasher = slasher;
+		PowerGauge powerGauge = new PowerGauge(this);
+		Thread autoIncrease = new Thread(powerGauge);
+		autoIncrease.start();
 	}
 	
-	public void increaseGauge(double amount){
+	public synchronized void increaseGauge(double amount){
 		if(this.gaugeValue + amount <= gaugeMax){
 			this.gaugeValue += amount;
 		}
