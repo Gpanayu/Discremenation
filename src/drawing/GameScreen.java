@@ -1,6 +1,7 @@
 package drawing;
 
 import input.InputUtility;
+import javafx.event.EventHandler;
 import javafx.scene.canvas.Canvas;
 import javafx.scene.canvas.GraphicsContext;
 import javafx.scene.input.KeyCode;
@@ -18,43 +19,38 @@ import sharedObject.RenderableHolder;
 
 public class GameScreen extends Pane{
 	private Canvas canvas;
-	private GameLogic logic;
-	private GameLoopUtility gameLoopUtility;
 
 	public GameScreen(double width, double height) {
 		super();
 		canvas = new Canvas(ConfigurableOption.SCREEN_WIDTH, ConfigurableOption.SCREEN_HEIGHT);
 		this.getChildren().add(canvas);
 		addListener();
-		this.canvas.setOnMouseClicked((event) -> {
-			Main.instance.toggleScene();
-		});
+		this.setFocusTraversable(true);
 	}
 	public void addListener() {
-		this.canvas.setOnKeyPressed((KeyEvent event) -> {
-			if(event.getCode() != KeyCode.W && event.getCode() != KeyCode.A && event.getCode() != KeyCode.D
-					&& event.getCode() != KeyCode.ALT && event.getCode() != KeyCode.SPACE
-					&& event.getCode() != KeyCode.LEFT && event.getCode() != KeyCode.UP
-					&& event.getCode() != KeyCode.RIGHT && event.getCode() != KeyCode.ENTER
-					&& event.getCode() != KeyCode.BACK_SLASH){
+		this.setOnKeyPressed((KeyEvent event) -> {
+			if(event.getCode() == KeyCode.W || event.getCode() == KeyCode.A || event.getCode() == KeyCode.D
+					|| event.getCode() == KeyCode.ALT || event.getCode() == KeyCode.SPACE
+					|| event.getCode() == KeyCode.LEFT || event.getCode() == KeyCode.UP
+					|| event.getCode() == KeyCode.RIGHT || event.getCode() == KeyCode.ENTER
+					|| event.getCode() == KeyCode.BACK_SLASH){
 				
-				return ;
+				InputUtility.setKeyPressed(event.getCode(), true);
 				
 			}
 			InputUtility.setKeyPressed(event.getCode(), true);
 		});
 
-		this.canvas.setOnKeyReleased((KeyEvent event) -> {
-			if(event.getCode() != KeyCode.W && event.getCode() != KeyCode.A && event.getCode() != KeyCode.D
-					&& event.getCode() != KeyCode.ALT && event.getCode() != KeyCode.SPACE
-					&& event.getCode() != KeyCode.LEFT && event.getCode() != KeyCode.UP
-					&& event.getCode() != KeyCode.RIGHT && event.getCode() != KeyCode.ENTER
-					&& event.getCode() != KeyCode.BACK_SLASH){
+		this.setOnKeyReleased((KeyEvent event) -> {
+			if(event.getCode() == KeyCode.W || event.getCode() == KeyCode.A || event.getCode() == KeyCode.D
+					|| event.getCode() == KeyCode.ALT || event.getCode() == KeyCode.SPACE
+					|| event.getCode() == KeyCode.LEFT || event.getCode() == KeyCode.UP
+					|| event.getCode() == KeyCode.RIGHT || event.getCode() == KeyCode.ENTER
+					|| event.getCode() == KeyCode.BACK_SLASH){
 				
-				return ;
+				InputUtility.setKeyPressed(event.getCode(), false);
 				
 			}
-			InputUtility.setKeyPressed(event.getCode(), false);
 		});
 
 		this.canvas.setOnMousePressed((MouseEvent event) -> {
@@ -65,6 +61,10 @@ public class GameScreen extends Pane{
 		this.canvas.setOnMouseReleased((MouseEvent event) -> {
 			if (event.getButton() == MouseButton.PRIMARY)
 				InputUtility.mouseLeftRelease();
+		});
+		
+		this.canvas.setOnMouseClicked((event) -> {
+			Main.instance.toggleScene();
 		});
 
 		this.canvas.setOnMouseEntered((MouseEvent event) -> {

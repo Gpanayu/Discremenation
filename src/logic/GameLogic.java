@@ -20,8 +20,8 @@ public class GameLogic {
 		RenderableHolder.getInstance().add(field);
 		//Set player1 be white and player2 be black.
 		player1 = new Blinker(5, 300, Slasher.DIRECTION_RIGHT, false);
-		addNewObject(player1);
 		player2 = new Blinker(500, 300, Slasher.DIRECTION_LEFT, true);
+		addNewObject(player1);
 		addNewObject(player2);
 	}
 	

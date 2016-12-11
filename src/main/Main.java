@@ -27,6 +27,7 @@ public class Main extends Application {
 	
 	@Override
 	public void start(Stage primaryStage) {
+		System.out.println("start");
 		instance = this;
 		isGameScreen = false;
 		theStage = primaryStage;

@@ -24,6 +24,7 @@ public abstract class Slasher extends Entity{
 	protected int slashTime;
 	protected int stunTime;
 	protected int immuneTime;
+	protected boolean isImmune;
 	
 	public static final int DIRECTION_RIGHT = 1;
 	public static final int DIRECTION_LEFT = -1;
@@ -33,8 +34,11 @@ public abstract class Slasher extends Entity{
 	public static final int INITIAL_SPEED_X = 15;
 	public static final int INITIAL_SPEED_Y = 15;
 	
+	protected boolean canMove = true; //change
+	
 	public Slasher(double x, double y, int direction){
 		super(x, y);
+		super.z = 5;
 		this.directionX = direction;
 		this.directionY = NOT_JUMP;
 		this.height = ConfigurableOption.SLASHER_HEIGHT;
@@ -46,19 +50,16 @@ public abstract class Slasher extends Entity{
 		this.accelerationY = 10;
 		states = new boolean[10];
 		states[0] = true;
-		states[1] = true;
 		for(int i = 2; i < states.length ; i++){
 			states[i] = false;
 		}
 		prevStates = new boolean[10];
 		prevStates[0] = true;
-		prevStates[1] = true;
 		for(int i = 2; i < prevStates.length ; i++){
 			prevStates[i] = false;
 		}
 		counter = 0;
 		immuneCounter = 0;
-		
 	}
 	
 	protected boolean checkSameStates(){
@@ -76,11 +77,13 @@ public abstract class Slasher extends Entity{
 		clearStates();
 		states[3] = true;
 		if(canSlash(other) && !other.states[6]){
-			other.hp.decreaseHP(1);
-			other.gauge.increaseGauge(1);
+			if(!other.isImmune){
+				other.hp.decreaseHP(1);
+				other.gauge.increaseGauge(1);
+			}
 			other.stun();
-			other.states[6] = true;
 		}
+		this.canMove = false; //change
 	}
 	
 	protected boolean canSlash(Slasher other){
@@ -129,35 +132,59 @@ public abstract class Slasher extends Entity{
 	}
 	
 	protected void jump(){
-		if(!prevStates[4]){
+		if(prevStates[1]){
 			x += speedX * directionX;
+			speedY = speedX;
+			directionY = DIRECTION_UP;
+			y += speedY * directionY;
+			clearStates();
+			states[4] = true;
+			this.canMove = false;
+		}
+		else if(prevStates[0]){
 			speedY = INITIAL_SPEED_Y;
 			directionY = DIRECTION_UP;
 			y += speedY * directionY;
+			clearStates();
+			states[4] = true;
+			this.canMove = false;
 		}
 		else{
 			x += speedX * directionX;
+			y += speedY * directionY;
+			speedY += directionY;
 			if(speedY == 0){
 				directionY = DIRECTION_DOWN;
 				clearStates();
 				states[4] = true;
+				this.canMove = false;
 			}
 			if(y >= ConfigurableOption.SCREEN_HEIGHT - height - ConfigurableOption.FLOOR){
 				y = ConfigurableOption.SCREEN_HEIGHT - height - ConfigurableOption.FLOOR;
 				directionY = NOT_JUMP;
 				speedY = 0;
 				idle();
+				this.canMove = true;
 			}
 			else if(y < 0){
 				y = 0;
 				clearStates();
 				states[4] = true;
+				this.canMove = false;
 			}
-			y += speedY * directionY;
+			if(x >= ConfigurableOption.SCREEN_WIDTH - width){
+				x = ConfigurableOption.SCREEN_WIDTH - width;
+			}
+			else if(x <= 0){
+				x = 0;
+			}
 		}
 	}
 	
 	protected void run(){
+		if(!prevStates[1]){
+			speedX = INITIAL_SPEED_X;
+		}
 		x += speedX * directionX;
 		speedX += accelerationX;
 		clearStates();
@@ -181,17 +208,27 @@ public abstract class Slasher extends Entity{
 					speedX = INITIAL_SPEED_X;
 				}
 			}
+			isImmune = true;
 		}
 		x += speedX * (-directionX);
+		if(x >= ConfigurableOption.SCREEN_WIDTH - width){
+			x = ConfigurableOption.SCREEN_WIDTH - width;
+		}
+		else if(x <= 0){
+			x = 0;
+		}
 		clearStates();
 		states[2] = true;
+		this.canMove = false; // change
 	}
 	
 	protected void idle(){
 		speedX = 0;
 		speedY = 0;
+		y = ConfigurableOption.SCREEN_HEIGHT - ConfigurableOption.FLOOR - height;
 		clearStates();
 		states[0] = true;
+		this.canMove = true;
 	}
 	
 	public int getHeight() {
@@ -246,32 +283,37 @@ public abstract class Slasher extends Entity{
 	protected void update(){
 		if(this instanceof Blinker){
 			Blinker b = (Blinker)(this);
-			b.updateAnimation();
-			if(prevStates[2]){
+//			b.updateAnimation();
+			if(states[2]){
 				counter += 1;
 				if(counter == stunTime){
 					idle();
 					counter = 0;
 				}
+				else{
+					stun();
+				}
 			}
 			else if(prevStates[3]){
 				counter += 1;
+				clearStates();
+				states[3] = true;
 				if(counter == slashTime){
 					idle();
 					counter = 0;
 				}
 			}
-			if(prevStates[6]){
+			if(isImmune){
 				immuneCounter += 1;
 				if(immuneCounter == immuneTime){
-					states[6] = false;
+					isImmune = false;
 					immuneCounter = 0;
 				}
 			}
-			if((InputUtility.getKeyPressed(KeyCode.W) && !b.isBlack()) || (InputUtility.getKeyPressed(KeyCode.UP) && b.isBlack())){
+			if(((InputUtility.getKeyPressed(KeyCode.W) && !b.isBlack()) || (InputUtility.getKeyPressed(KeyCode.UP) && b.isBlack())) && b.canMove || b.prevStates[4]){
 				b.jump();
 			}
-			else if((InputUtility.getKeyPressed(KeyCode.A) && !b.isBlack()) || (InputUtility.getKeyPressed(KeyCode.LEFT) && b.isBlack())){
+			else if(((InputUtility.getKeyPressed(KeyCode.A) && !b.isBlack()) || (InputUtility.getKeyPressed(KeyCode.LEFT) && b.isBlack())) && b.canMove){
 				if(directionX != Slasher.DIRECTION_LEFT){
 					directionX = Slasher.DIRECTION_LEFT;
 					idle();
@@ -281,7 +323,7 @@ public abstract class Slasher extends Entity{
 					counter = 0;
 				}
 			}
-			else if((InputUtility.getKeyPressed(KeyCode.D) && !b.isBlack()) || (InputUtility.getKeyPressed(KeyCode.RIGHT) && b.isBlack())){
+			else if(((InputUtility.getKeyPressed(KeyCode.D) && !b.isBlack()) || (InputUtility.getKeyPressed(KeyCode.RIGHT) && b.isBlack())) && b.canMove){
 				if(directionX != Slasher.DIRECTION_RIGHT){
 					directionX = Slasher.DIRECTION_RIGHT;
 					idle();
@@ -291,14 +333,17 @@ public abstract class Slasher extends Entity{
 					counter = 0;
 				}
 			}
-			else if(InputUtility.getKeyPressed(KeyCode.SPACE) && !b.isBlack()){
+			else if(InputUtility.getKeyPressed(KeyCode.SPACE) && !b.isBlack() && b.canMove || prevStates[3]){
 				b.slash(GameLogic.getPlayer2());
 			}
-			else if(InputUtility.getKeyPressed(KeyCode.ENTER) && b.isBlack()){
+			else if(InputUtility.getKeyPressed(KeyCode.ENTER) && b.isBlack() && b.canMove || prevStates[3]){
 				b.slash(GameLogic.getPlayer1());
 			}
-			else if((InputUtility.getKeyPressed(KeyCode.ALT) && !b.isBlack()) || (InputUtility.getKeyPressed(KeyCode.BACK_SLASH) && b.isBlack())){
-				// use special power
+			else if(((InputUtility.getKeyPressed(KeyCode.ALT) && !b.isBlack()) || (InputUtility.getKeyPressed(KeyCode.BACK_SLASH) && b.isBlack())) && b.canMove){
+//				use special power
+			}
+			else{
+				idle();
 			}
 		}
 		prevStates = states;

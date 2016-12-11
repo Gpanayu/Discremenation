@@ -17,7 +17,7 @@ public class ConfigurableOption {
 	public static final int SLASHER_WIDTH = 550;
 	public static final int SLASHER_HEIGHT = 400;
 	public static Image firstBackground = new Image(ClassLoader.getSystemResource("bg.png").toString());
-	  
+	public static final int TIME_PER_ROUND = 60;
 	public static void setBackground(String source){
 		firstBackground = new Image(ClassLoader.getSystemResource(source).toString());
 	}

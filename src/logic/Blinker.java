@@ -10,7 +10,6 @@ public class Blinker extends Slasher{
 	private Image yellowSheet;
 	private int frameDelay;
 	private int currentFrame, frameDelayCount;
-	private int x, y, frameWidth, frameHeight;
 	private boolean isBlack;
 	private boolean visible = false, playing = false;
 	private Image rightSheet;
@@ -33,8 +32,6 @@ public class Blinker extends Slasher{
 		this.frameDelay = frameDelay;
 		this.currentFrame = 0;
 		this.frameDelayCount = 0;
-		this.x = 0;
-		this.y = 0;
 //		if(this.sheet == null){
 //			this.frameWidth = 0;
 //			this.frameHeight = 0;
@@ -87,6 +84,14 @@ public class Blinker extends Slasher{
 		if (states[0]){
 			gc.setFill(Color.RED);
 			gc.fillRect(x, frameDelay, width, height);
+			for(Entity e : GameLogic.getGameObjectContainer()){
+				if(e instanceof Slasher){
+					if(this.equals((Blinker)e)){
+						gc.setFill(Color.BLACK);
+						gc.fillText(Boolean.toString(isBlack), x, y+40);
+					}
+				}
+			}
 		}else if(states[1]){
 			gc.setFill(Color.GREEN);
 			gc.fillRect(x, frameDelay, width, height);
