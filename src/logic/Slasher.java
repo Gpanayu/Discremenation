@@ -16,10 +16,9 @@ public abstract class Slasher extends Entity{
 	protected int accelerationY;
 	protected boolean[] states;
 	protected boolean[] prevStates;
-	protected HP hp;
-	protected Gauge gauge;
 	
 	protected int counter;
+	protected int runTime;
 	protected int immuneCounter;
 	protected int slashTime;
 	protected int stunTime;
@@ -32,9 +31,8 @@ public abstract class Slasher extends Entity{
 	public static final int DIRECTION_DOWN = 1;
 	public static final int NOT_JUMP = 0;
 	public static final int INITIAL_SPEED_X = 15;
-	public static final int INITIAL_SPEED_Y = 15;
-	
-	protected boolean canMove = true; //change
+	public static final int INITIAL_SPEED_Y = 15;	
+	protected boolean canMove;
 	
 	public Slasher(double x, double y, int direction){
 		super(x, y);
@@ -53,6 +51,8 @@ public abstract class Slasher extends Entity{
 		for(int i = 2; i < states.length ; i++){
 			states[i] = false;
 		}
+		this.canMove = true;
+		this.isImmune = false;
 		prevStates = new boolean[10];
 		prevStates[0] = true;
 		for(int i = 2; i < prevStates.length ; i++){
@@ -78,10 +78,16 @@ public abstract class Slasher extends Entity{
 		states[3] = true;
 		if(canSlash(other) && !other.states[6]){
 			if(!other.isImmune){
-				other.hp.decreaseHP(1);
-				other.gauge.increaseGauge(1);
+				if(other.equals(GameLogic.getPlayer1())){
+					GameLogic.getHPPlayer1().decreaseHP(1);
+					GameLogic.getGaugePlayer1().increaseGauge(1);
+				}
+				else{
+					GameLogic.getHPPlayer2().decreaseHP(1);
+					GameLogic.getGaugePlayer2().increaseGauge(1);
+				}
+				other.stun();
 			}
-			other.stun();
 		}
 		this.canMove = false; //change
 	}

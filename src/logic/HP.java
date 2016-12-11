@@ -16,6 +16,8 @@ public class HP extends Entity {
 	}
 	
 	public void decreaseHP(double amount){
+		System.out.println(this.HPValue);
+		System.out.println(amount);
 		if (this.HPValue - amount >= 0){
 			this.HPValue -= amount;
 		}

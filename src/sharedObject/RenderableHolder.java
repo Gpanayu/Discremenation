@@ -47,19 +47,19 @@ public class RenderableHolder {
 		yellowLeft = new Image(ClassLoader.getSystemResource("YellowLeft.png").toString());
 	}
 	
-	public synchronized void add(IRenderable entity) {
+	public void add(IRenderable entity) {
 		entities.add(entity);
 		Collections.sort(entities, comparator);
 	}
 	
-	public synchronized void update() {
+	public void update() {
 		for (int i = entities.size() - 1; i >= 0; i--) {
 			if (entities.get(i).isDestroyed())
 				entities.remove(i);
 		}
 	}
 	
-	public synchronized List<IRenderable> getEntities() {
+	public List<IRenderable> getEntities() {
 		return entities;
 	}
 }

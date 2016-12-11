@@ -41,9 +41,12 @@ import sharedObject.IRenderable;
 import sharedObject.RenderableHolder;
 
 public class WelcomeScreen extends Pane{
+	public static WelcomeScreen instance;
 	private Canvas canvas;
+	private GameLogic gameLogic;
 	public WelcomeScreen(double width, double height){
 		super();
+		instance = this;
 		canvas = new Canvas(ConfigurableOption.SCREEN_WIDTH, ConfigurableOption.SCREEN_HEIGHT);
 		canvas.setFocusTraversable(true);
 		drawWelcome();
@@ -51,7 +54,7 @@ public class WelcomeScreen extends Pane{
 		this.setOnKeyPressed(new EventHandler<KeyEvent>(){
 			public void handle(KeyEvent event){
 				if(event.getCode() == KeyCode.ENTER){
-					GameLogic gameLogic = new GameLogic();
+					gameLogic = new GameLogic();
 					GameLoopUtility gameLoop = new GameLoopUtility();
 					gameLoop.runGameLoop(gameLogic);
 					Main.instance.toggleScene();
@@ -119,5 +122,9 @@ public class WelcomeScreen extends Pane{
 		gc.setFont(Font.font("Tahoma", FontWeight.BOLD, 30));
 		double w2 = fld.computeStringWidth("Press Enter", gc.getFont());		
 		gc.fillText("Press Enter", (ConfigurableOption.SCREEN_WIDTH / 2) - (w2/2), (ConfigurableOption.SCREEN_HEIGHT / 2) + 30);
+	}
+	
+	public GameLogic gameLogic(){
+		return this.gameLogic;
 	}
 }
