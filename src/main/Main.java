@@ -14,6 +14,7 @@ import javafx.stage.Stage;
 import javafx.stage.WindowEvent;
 import logic.GameLogic;
 import sharedObject.RenderableHolder;
+import thread.ThreadHolder;
 
 public class Main extends Application {
 	public static Main instance;
@@ -59,7 +60,11 @@ public class Main extends Application {
 	}
 	
 	public void stop() throws Exception{
-		//stop all threads
+		for(Thread t : ThreadHolder.instance.getThreads()){
+			if(t.isAlive()){
+				t.interrupt();
+			}
+		}
 	}
 	
 	public void toggleScene(){

@@ -13,7 +13,6 @@ public class TimeRunnable implements Runnable{
 			try {
 				Thread.sleep(1000);
 				currentTime --;
-				
 				//draw this timer, too.
 				
 			} catch (InterruptedException e) {

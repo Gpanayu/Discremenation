@@ -13,9 +13,7 @@ public class ConfigurableOption {
 	public static final double DAMAGE_Y = 33;
 	public static final double DAMAGE_WIDTH = 161;
 	public static final double DAMAGE_HEIGHT = 264.95;
-	public static final int FLOOR = 30;
-	public static final int SLASHER_WIDTH = 550;
-	public static final int SLASHER_HEIGHT = 400;
+	public static final int FLOOR = 300;
 	public static Image firstBackground = new Image(ClassLoader.getSystemResource("bg.png").toString());
 	public static final int TIME_PER_ROUND = 60;
 	public static void setBackground(String source){

@@ -2,6 +2,8 @@ package logic;
 
 import input.InputUtility;
 import javafx.animation.AnimationTimer;
+import javafx.scene.control.Alert;
+import javafx.scene.control.Alert.AlertType;
 import main.Main;
  
 
@@ -15,11 +17,14 @@ public class GameLoopUtility {
 				try{
 					logic.logicUpdate();
 					Main.instance.drawGameScreen();
+					if(GameLogic.getPlayer1().getIsDead() || GameLogic.getPlayer2().getIsDead()){
+						Main.instance.stop();
+						GameLoopUtility.animationTimer.stop();
+					}
 				}catch(Exception e){
 					e.printStackTrace();
 					GameLoopUtility.animationTimer.stop();
-				}
-				
+				}				
 			}
 		};
 		animationTimer.start();

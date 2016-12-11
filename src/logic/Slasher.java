@@ -6,8 +6,6 @@ import javafx.scene.paint.Color;
 import lib.ConfigurableOption;
 
 public abstract class Slasher extends Entity{
-	protected int height;
-	protected int width;
 	protected int directionX;
 	protected int directionY;
 	protected int speedX;
@@ -30,8 +28,8 @@ public abstract class Slasher extends Entity{
 	public static final int DIRECTION_UP = -1;
 	public static final int DIRECTION_DOWN = 1;
 	public static final int NOT_JUMP = 0;
-	public static final int INITIAL_SPEED_X = 15;
-	public static final int INITIAL_SPEED_Y = 15;	
+	public static final int INITIAL_SPEED_X = 5;
+	public static final int INITIAL_SPEED_Y = 30;	
 	protected boolean canMove;
 	
 	public Slasher(double x, double y, int direction){
@@ -39,9 +37,6 @@ public abstract class Slasher extends Entity{
 		super.z = 5;
 		this.directionX = direction;
 		this.directionY = NOT_JUMP;
-		this.height = ConfigurableOption.SLASHER_HEIGHT;
-		this.width = ConfigurableOption.SLASHER_WIDTH;
-		//INITIAL_SPEED and accelerationX and accelerationY are just dummy data, we have to discuss soon.
 		this.speedX = INITIAL_SPEED_X;
 		this.speedY = 0;
 		this.accelerationX = 5;
@@ -79,17 +74,17 @@ public abstract class Slasher extends Entity{
 		if(canSlash(other) && !other.states[6]){
 			if(!other.isImmune){
 				if(other.equals(GameLogic.getPlayer1())){
-					GameLogic.getHPPlayer1().decreaseHP(1);
+					GameLogic.getHPPlayer1().decreaseHP(50);
 					GameLogic.getGaugePlayer1().increaseGauge(1);
 				}
 				else{
-					GameLogic.getHPPlayer2().decreaseHP(1);
+					GameLogic.getHPPlayer2().decreaseHP(50);
 					GameLogic.getGaugePlayer2().increaseGauge(1);
 				}
 				other.stun();
 			}
 		}
-		this.canMove = false; //change
+		this.canMove = false;
 	}
 	
 	protected boolean canSlash(Slasher other){
@@ -138,16 +133,7 @@ public abstract class Slasher extends Entity{
 	}
 	
 	protected void jump(){
-		if(prevStates[1]){
-			x += speedX * directionX;
-			speedY = speedX;
-			directionY = DIRECTION_UP;
-			y += speedY * directionY;
-			clearStates();
-			states[4] = true;
-			this.canMove = false;
-		}
-		else if(prevStates[0]){
+		if(prevStates[0] || prevStates[1]){
 			speedY = INITIAL_SPEED_Y;
 			directionY = DIRECTION_UP;
 			y += speedY * directionY;
@@ -165,8 +151,8 @@ public abstract class Slasher extends Entity{
 				states[4] = true;
 				this.canMove = false;
 			}
-			if(y >= ConfigurableOption.SCREEN_HEIGHT - height - ConfigurableOption.FLOOR){
-				y = ConfigurableOption.SCREEN_HEIGHT - height - ConfigurableOption.FLOOR;
+			if(y >= ConfigurableOption.SCREEN_HEIGHT - ConfigurableOption.FLOOR){
+				y = ConfigurableOption.SCREEN_HEIGHT - ConfigurableOption.FLOOR;
 				directionY = NOT_JUMP;
 				speedY = 0;
 				idle();
@@ -178,8 +164,8 @@ public abstract class Slasher extends Entity{
 				states[4] = true;
 				this.canMove = false;
 			}
-			if(x >= ConfigurableOption.SCREEN_WIDTH - width){
-				x = ConfigurableOption.SCREEN_WIDTH - width;
+			if(x >= ConfigurableOption.SCREEN_WIDTH - ConfigurableOption.HIT_WIDTH){
+				x = ConfigurableOption.SCREEN_WIDTH - ConfigurableOption.HIT_WIDTH;
 			}
 			else if(x <= 0){
 				x = 0;
@@ -195,8 +181,8 @@ public abstract class Slasher extends Entity{
 		speedX += accelerationX;
 		clearStates();
 		states[1] = true;
-		if(x >= ConfigurableOption.SCREEN_WIDTH - width){
-			x = ConfigurableOption.SCREEN_WIDTH - width;
+		if(x >= ConfigurableOption.SCREEN_WIDTH - ConfigurableOption.HIT_WIDTH){
+			x = ConfigurableOption.SCREEN_WIDTH - ConfigurableOption.HIT_WIDTH;
 			idle();
 		}
 		else if(x <= 0){
@@ -217,34 +203,26 @@ public abstract class Slasher extends Entity{
 			isImmune = true;
 		}
 		x += speedX * (-directionX);
-		if(x >= ConfigurableOption.SCREEN_WIDTH - width){
-			x = ConfigurableOption.SCREEN_WIDTH - width;
+		if(x >= ConfigurableOption.SCREEN_WIDTH - ConfigurableOption.HIT_WIDTH){
+			x = ConfigurableOption.SCREEN_WIDTH - ConfigurableOption.HIT_WIDTH;
 		}
 		else if(x <= 0){
 			x = 0;
 		}
 		clearStates();
 		states[2] = true;
-		this.canMove = false; // change
+		this.canMove = false;
 	}
 	
 	protected void idle(){
 		speedX = 0;
 		speedY = 0;
-		y = ConfigurableOption.SCREEN_HEIGHT - ConfigurableOption.FLOOR - height;
+		y = ConfigurableOption.SCREEN_HEIGHT - ConfigurableOption.FLOOR;
 		clearStates();
 		states[0] = true;
 		this.canMove = true;
 	}
 	
-	public int getHeight() {
-		return height;
-	}
-
-
-	public int getWidth() {
-		return width;
-	}
 
 	public int getDirectionX() {
 		return directionX;
@@ -289,12 +267,28 @@ public abstract class Slasher extends Entity{
 	protected void update(){
 		if(this instanceof Blinker){
 			Blinker b = (Blinker)(this);
-//			b.updateAnimation();
+			b.updateAnimation();
 			if(states[2]){
 				counter += 1;
-				if(counter == stunTime){
-					idle();
-					counter = 0;
+				if(counter >= stunTime){
+					if(b.equals(GameLogic.getPlayer1())){
+						if(GameLogic.getHPPlayer1().getHPValue() == 0){
+							b.setIsDead();
+						}
+						else{
+							idle();
+							counter = 0;
+						}
+					}
+					else{
+						if(GameLogic.getHPPlayer2().getHPValue() == 0){
+							b.setIsDead();
+						}
+						else{
+							idle();
+							counter = 0;
+						}
+					}
 				}
 				else{
 					stun();
@@ -304,14 +298,14 @@ public abstract class Slasher extends Entity{
 				counter += 1;
 				clearStates();
 				states[3] = true;
-				if(counter == slashTime){
+				if(counter >= slashTime){
 					idle();
 					counter = 0;
 				}
 			}
 			if(isImmune){
 				immuneCounter += 1;
-				if(immuneCounter == immuneTime){
+				if(immuneCounter >= immuneTime){
 					isImmune = false;
 					immuneCounter = 0;
 				}
@@ -348,7 +342,7 @@ public abstract class Slasher extends Entity{
 			else if(((InputUtility.getKeyPressed(KeyCode.ALT) && !b.isBlack()) || (InputUtility.getKeyPressed(KeyCode.BACK_SLASH) && b.isBlack())) && b.canMove){
 //				use special power
 			}
-			else{
+			else if(!prevStates[5]){
 				idle();
 			}
 		}
@@ -358,6 +352,9 @@ public abstract class Slasher extends Entity{
 	protected void setIsDead(){
 		clearStates();
 		this.states[5] = true;
+		canMove = false;
+		speedX = 0;
+		speedY = 0;
 	}
 	
 	protected boolean getIsDead(){
