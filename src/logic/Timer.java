@@ -26,7 +26,9 @@ public class Timer extends Entity{
 					Thread.sleep(1000);
 				}catch(InterruptedException e){
 				}
-				time --;
+				if((time - 1 >= 0)){
+					time --;
+				}
 			}
 		});
 		ThreadHolder.instance.getThreads().add(timeCounter);
@@ -45,6 +47,13 @@ public class Timer extends Entity{
 		gc.setFont(font);
 		gc.fillText(timeString, x - font_width, y);
 		
+	}
+	
+	public static boolean isZero(){
+		if (time <= 0){
+			return true;
+		}
+		return false;
 	}
 
 }

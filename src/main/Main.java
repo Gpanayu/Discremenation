@@ -15,6 +15,7 @@ import javafx.stage.Stage;
 import javafx.stage.WindowEvent;
 import logic.GameLogic;
 import sharedObject.RenderableHolder;
+import thread.ThreadHolder;
 
 public class Main extends Application {
 	public static Main instance;
@@ -35,6 +36,7 @@ public class Main extends Application {
 		instance = this;
 		isGameScreen = false;
 		isMapScreen = false;
+
 		theStage = primaryStage;
 		theStage.setTitle("Discremenation");
 		theStage.setResizable(false);
@@ -48,18 +50,22 @@ public class Main extends Application {
 		StackPane root1 = new StackPane();
 		StackPane root2 = new StackPane();
 		StackPane root3 = new StackPane();
+
 		
 		gameScreen = new GameScreen(ConfigurableOption.SCREEN_WIDTH, ConfigurableOption.SCREEN_HEIGHT);
 		welcomeScreen = new WelcomeScreen(ConfigurableOption.SCREEN_WIDTH , ConfigurableOption.SCREEN_HEIGHT);
 		mapScreen = new MapScreen(ConfigurableOption.SCREEN_WIDTH , ConfigurableOption.SCREEN_HEIGHT);
+
 		
 		root1.getChildren().add(welcomeScreen);
 		root2.getChildren().add(gameScreen);
 		root3.getChildren().add(mapScreen);
+
 		
 		welcomeScene = new Scene(root1);
 		gameScene = new Scene(root2);
 		mapScene = new Scene(root3);
+
 		
 		theStage.setScene(welcomeScene);
 		theStage.sizeToScene();
@@ -68,7 +74,11 @@ public class Main extends Application {
 	}
 	
 	public void stop() throws Exception{
-		//stop all threads
+		for(Thread t : ThreadHolder.instance.getThreads()){
+			if(t.isAlive()){
+				t.interrupt();
+			}
+		}
 	}
 	
 	public void toggleScene(){

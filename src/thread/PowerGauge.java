@@ -14,9 +14,10 @@ public class PowerGauge implements Runnable{
 		while(true){
 			try{
 				Thread.sleep(16);
-			}catch(InterruptedException e){}
-			this.gauge.increaseGauge(0.5);
+				this.gauge.increaseGauge(0.5);
+			} catch(InterruptedException e){
+				break ;
+			}
 		}
-  		
   	}
 }

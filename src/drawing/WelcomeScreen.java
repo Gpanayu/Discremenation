@@ -4,11 +4,9 @@ import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.util.Scanner;
-import lib.ConfigurableOption;
 
 import javax.imageio.ImageIO;
 
-import com.sun.glass.events.MouseEvent;
 import com.sun.javafx.tk.FontLoader;
 import com.sun.javafx.tk.Toolkit;
 
@@ -56,15 +54,15 @@ public class WelcomeScreen extends Pane{
 		this.setOnKeyPressed(new EventHandler<KeyEvent>(){
 			public void handle(KeyEvent event){
 				if(event.getCode() == KeyCode.ENTER){
+					RenderableHolder.getInstance().getEntities().clear();
 					gameLogic = new GameLogic();
-					GameLoopUtility gameLoop = new GameLoopUtility();
-					gameLoop.runGameLoop(gameLogic);
+					new GameLoopUtility();
+					GameLoopUtility.runGameLoop(gameLogic);
 					Main.instance.toggleScene();
 				}
 				if(event.getCode() == KeyCode.SPACE){
 					Main.instance.toggleMap();
 				}
-				
 			}
 		});
 		this.setOnMousePressed((event) -> {
@@ -138,13 +136,13 @@ public class WelcomeScreen extends Pane{
 		double w4 = fld.computeStringWidth("Hold Mouse for CommandList",gc.getFont());
 		gc.fillText("Hold Mouse for CommandList", (ConfigurableOption.SCREEN_WIDTH / 2) - (w4/2), (ConfigurableOption.SCREEN_HEIGHT / 2) + 175);
 
-
 	}
 	
 	public void drawCommandList(){
 		GraphicsContext gc = canvas.getGraphicsContext2D();
 		gc.drawImage(RenderableHolder.commandList, 0, 0);
 	}
+	
 	public GameLogic gameLogic(){
 		return this.gameLogic;
 	}

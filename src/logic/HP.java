@@ -11,6 +11,7 @@ public class HP extends Entity {
 	private Slasher slasher;
 	private static final Font font = Font.font("Verdana", FontWeight.MEDIUM, 15);
 
+	
 	public HP(double x, double y, Color color, Slasher slasher, double hpValue){
 		super(x,y);
 		this.HPValue = hpValue;
@@ -20,14 +21,11 @@ public class HP extends Entity {
 	}
 	
 	public void decreaseHP(double amount){
-//		System.out.println(this.HPValue);
-//		System.out.println(amount);
 		if (this.HPValue - amount >= 0){
 			this.HPValue -= amount;
 		}
 		if (this.HPValue - amount <= 0 ){
 			this.HPValue = 0;
-			this.slasher.setIsDead();
 		}
 	}
 	
@@ -50,7 +48,6 @@ public class HP extends Entity {
 		gc.setFont(font);
 		gc.fillText("HP", x - 30, y + 10);
 		gc.fillRect(x, y, HPValue, 10);
-		
 		
 	}
 

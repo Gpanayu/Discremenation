@@ -32,9 +32,9 @@ public class RenderableHolder {
 	public static Image duel_menu;
 	public static Image decoy_menu;
 	
-	private static final String slash = "sound/slash.mp3";
-	private static final String hit = "sound/hit.mp3";
-	private static final String blink = "sound/blink.mp3";
+	private static final String slash = "sound/slash.wav";
+	private static final String hit = "sound/hit.wav";
+	private static final String blink = "sound/blink.wav";
 	
 	private static AudioClip slash_sound;
 	private static AudioClip hit_sound;
@@ -94,6 +94,21 @@ public class RenderableHolder {
 		for (int i = entities.size() - 1; i >= 0; i--) {
 			if (entities.get(i).isDestroyed())
 				entities.remove(i);
+		}
+	}
+	
+	public AudioClip getSound(String sound){
+		if (sound.equals("slash_sound")){
+			return this.slash_sound;
+		}
+		else if(sound.equals("hit_sound")){
+			return this.hit_sound;
+		}
+		else if (sound.equals("blink_sound")){
+			return this.blink_sound;
+		}
+		else{
+			return null;
 		}
 	}
 	
