@@ -8,6 +8,8 @@ import javax.imageio.ImageIO;
 import javafx.scene.image.Image;
 
 public class Utility {
+
+
 	public static boolean isImageValid(Image img){
 		if(Math.abs(img.getWidth() - 1500) < 0.001 && Math.abs(img.getHeight() - 800) < 0.001){
 			return true;

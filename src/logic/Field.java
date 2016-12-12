@@ -1,8 +1,6 @@
 package logic;
 
 
-
-
 import javafx.scene.canvas.GraphicsContext;
 import javafx.scene.image.Image;
 import javafx.scene.image.WritableImage;
@@ -64,7 +62,6 @@ public class Field implements IRenderable{
 			currentDrawingX += imageWidth;
 			currentDrawingY = 0;
 		}
-		
 		gc.setFill(Color.WHITE);
 		gc.fillRect(0, 0, ConfigurableOption.SCREEN_WIDTH / 2, ConfigurableOption.SCREEN_HEIGHT / 7);
 		gc.setFill(Color.BLACK);

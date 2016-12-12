@@ -4,9 +4,11 @@ import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.util.Scanner;
+import lib.ConfigurableOption;
 
 import javax.imageio.ImageIO;
 
+import com.sun.glass.events.MouseEvent;
 import com.sun.javafx.tk.FontLoader;
 import com.sun.javafx.tk.Toolkit;
 
@@ -43,7 +45,7 @@ import sharedObject.RenderableHolder;
 public class WelcomeScreen extends Pane{
 	public static WelcomeScreen instance;
 	private Canvas canvas;
-	private GameLogic gameLogic; // changed
+	private GameLogic gameLogic;
 	public WelcomeScreen(double width, double height){
 		super();
 		instance = this;
@@ -54,12 +56,22 @@ public class WelcomeScreen extends Pane{
 		this.setOnKeyPressed(new EventHandler<KeyEvent>(){
 			public void handle(KeyEvent event){
 				if(event.getCode() == KeyCode.ENTER){
-					instance.gameLogic = new GameLogic(); // changed
+					gameLogic = new GameLogic();
 					GameLoopUtility gameLoop = new GameLoopUtility();
 					gameLoop.runGameLoop(gameLogic);
 					Main.instance.toggleScene();
 				}
+				if(event.getCode() == KeyCode.SPACE){
+					Main.instance.toggleMap();
+				}
+				
 			}
+		});
+		this.setOnMousePressed((event) -> {
+			drawCommandList();
+		});
+		this.setOnMouseReleased((event) -> {
+			drawWelcome();
 		});
 		Button btn = new Button("Select");
 		Label label = new Label("Select Background");
@@ -112,19 +124,28 @@ public class WelcomeScreen extends Pane{
 	@SuppressWarnings("restriction")
 	public void drawWelcome() {
 		GraphicsContext gc = canvas.getGraphicsContext2D();
-		gc.setFill(Color.WHITE);
-		gc.fillRect(0, 0, ConfigurableOption.SCREEN_WIDTH, ConfigurableOption.SCREEN_HEIGHT);
+		gc.drawImage(RenderableHolder.welcomeBackGround, 0, 0);
 		gc.setFill(Color.BLACK);
 		gc.setFont(Font.font("Tahoma", FontWeight.EXTRA_BOLD, 50));
 		FontLoader fld = Toolkit.getToolkit().getFontLoader();
 		double w1 = fld.computeStringWidth("DISCREMENATION", gc.getFont());
-		gc.fillText("DISCREMENATION", (ConfigurableOption.SCREEN_WIDTH / 2) - (w1/2), (ConfigurableOption.SCREEN_HEIGHT / 2) - 50);
+		gc.fillText("DISCREMENATION", (ConfigurableOption.SCREEN_WIDTH / 2) - (w1/2), (ConfigurableOption.SCREEN_HEIGHT / 2) - 200);
 		gc.setFont(Font.font("Tahoma", FontWeight.BOLD, 30));
-		double w2 = fld.computeStringWidth("Press Enter", gc.getFont());		
-		gc.fillText("Press Enter", (ConfigurableOption.SCREEN_WIDTH / 2) - (w2/2), (ConfigurableOption.SCREEN_HEIGHT / 2) + 30);
+		double w2 = fld.computeStringWidth("Press Enter to Play", gc.getFont());		
+		gc.fillText("Press Enter to Play", (ConfigurableOption.SCREEN_WIDTH / 2) - (w2/2), (ConfigurableOption.SCREEN_HEIGHT / 2) + 30);
+		double w3 = fld.computeStringWidth("Press Space to Select Map",gc.getFont());
+		gc.fillText("Press Space to Select Map", (ConfigurableOption.SCREEN_WIDTH / 2) - (w3/2), (ConfigurableOption.SCREEN_HEIGHT / 2) + 100);
+		double w4 = fld.computeStringWidth("Hold Mouse for CommandList",gc.getFont());
+		gc.fillText("Hold Mouse for CommandList", (ConfigurableOption.SCREEN_WIDTH / 2) - (w4/2), (ConfigurableOption.SCREEN_HEIGHT / 2) + 175);
+
+
 	}
-	public GameLogic getGameLogic(){ // changed
-		System.out.println("logic");
-		return this.gameLogic; // changed
-	} // changed
+	
+	public void drawCommandList(){
+		GraphicsContext gc = canvas.getGraphicsContext2D();
+		gc.drawImage(RenderableHolder.commandList, 0, 0);
+	}
+	public GameLogic gameLogic(){
+		return this.gameLogic;
+	}
 }

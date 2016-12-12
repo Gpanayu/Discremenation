@@ -2,6 +2,7 @@ package main;
 
 
 import drawing.GameScreen;
+import drawing.MapScreen;
 import drawing.WelcomeScreen;
 import input.InputUtility;
 import lib.ConfigurableOption;
@@ -18,17 +19,22 @@ import sharedObject.RenderableHolder;
 public class Main extends Application {
 	public static Main instance;
 	private boolean isGameScreen;
+	private boolean isMapScreen;
 	private GameScreen gameScreen;
 	private Scene gameScene;
 	private WelcomeScreen welcomeScreen;
 	private Scene welcomeScene;
 	private Stage theStage;
 	private GameLogic gameLogic;
+	private MapScreen mapScreen;
+	private Scene mapScene;
 	
 	@Override
 	public void start(Stage primaryStage) {
+		System.out.println("start");
 		instance = this;
 		isGameScreen = false;
+		isMapScreen = false;
 		theStage = primaryStage;
 		theStage.setTitle("Discremenation");
 		theStage.setResizable(false);
@@ -41,15 +47,19 @@ public class Main extends Application {
 		
 		StackPane root1 = new StackPane();
 		StackPane root2 = new StackPane();
+		StackPane root3 = new StackPane();
 		
 		gameScreen = new GameScreen(ConfigurableOption.SCREEN_WIDTH, ConfigurableOption.SCREEN_HEIGHT);
 		welcomeScreen = new WelcomeScreen(ConfigurableOption.SCREEN_WIDTH , ConfigurableOption.SCREEN_HEIGHT);
+		mapScreen = new MapScreen(ConfigurableOption.SCREEN_WIDTH , ConfigurableOption.SCREEN_HEIGHT);
 		
 		root1.getChildren().add(welcomeScreen);
 		root2.getChildren().add(gameScreen);
+		root3.getChildren().add(mapScreen);
 		
 		welcomeScene = new Scene(root1);
 		gameScene = new Scene(root2);
+		mapScene = new Scene(root3);
 		
 		theStage.setScene(welcomeScene);
 		theStage.sizeToScene();
@@ -71,6 +81,16 @@ public class Main extends Application {
 		}
 	}
 	
+	public void toggleMap(){
+		if (isMapScreen){
+			theStage.setScene(welcomeScene);
+			this.isMapScreen = false;
+		}else{
+			theStage.setScene(mapScene);
+			this.isMapScreen = true;
+		}
+	}
+	
 	public Stage getTheStage(){
 		return theStage;
 	}
@@ -78,12 +98,6 @@ public class Main extends Application {
 	public void drawGameScreen(){
 		gameScreen.paintComponent();
 	}
-
-	public WelcomeScreen getWelcomeScreen() {
-		System.out.println("main");
-		return welcomeScreen;
-	}
-
 
 	public static void main(String[] args) {
 		launch(args);
