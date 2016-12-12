@@ -198,6 +198,7 @@ public abstract class Slasher extends Entity{
 					}
 					clearStates();
 					states[2] = true;
+					canMove = false;
 				}
 			}
 			isImmune = true;
@@ -206,14 +207,12 @@ public abstract class Slasher extends Entity{
 		y += speedY * directionY;
 		speedY += directionY * accelerationY;
 		if(speedY == 0 && directionY != NOT_JUMP){
-			System.out.println("in1");
 			directionY = DIRECTION_DOWN;
 			clearStates();
 			states[2] = true;
 			this.canMove = false;
 		}
 		if(y >= ConfigurableOption.SCREEN_HEIGHT - ConfigurableOption.FLOOR && directionY != NOT_JUMP){
-			System.out.println("in2");
 			y = ConfigurableOption.SCREEN_HEIGHT - ConfigurableOption.FLOOR;
 			directionY = NOT_JUMP;
 			speedY = 0;
@@ -221,52 +220,56 @@ public abstract class Slasher extends Entity{
 			counter = 0;
 			this.canMove = true;
 			if(this.equals(GameLogic.getPlayer1())){
-				System.out.println("in6");
 				if(GameLogic.getHPPlayer1().getHPValue() <= 0){
-					System.out.println("in7");
 					this.setIsDead();
 				}
 			}
 			else{
-				System.out.println("in8");
 				if(GameLogic.getHPPlayer2().getHPValue() <= 0){
-					System.out.println("in9");
 					this.setIsDead();
 				}
 			}
 		}
 		else if(y < 0){
-			System.out.println("in3");
 			y = 0;
 			clearStates();
 			states[2] = true;
 			this.canMove = false;
 		}
 		if(x >= ConfigurableOption.SCREEN_WIDTH - ConfigurableOption.HIT_WIDTH){
-			System.out.println("in4");
-//			if(y >= ConfigurableOption.SCREEN_HEIGHT - ConfigurableOption.FLOOR && directionY != NOT_JUMP){
-//				System.out.println("in5");
-//				y = ConfigurableOption.SCREEN_HEIGHT - ConfigurableOption.FLOOR;
-//				directionY = NOT_JUMP;
-//				speedY = 0;
-//				idle();
-//				counter = 0;
-//				this.canMove = true;
-//			}
 			if(directionY != NOT_JUMP){
 				clearStates();
 				states[2] = true;
 			}
 			x = ConfigurableOption.SCREEN_WIDTH - ConfigurableOption.HIT_WIDTH;
+			if(this.equals(GameLogic.getPlayer1())){
+				if(GameLogic.getHPPlayer1().getHPValue() <= 0){
+					this.setIsDead();
+				}
+			}
+			else{
+				if(GameLogic.getHPPlayer2().getHPValue() <= 0){
+					this.setIsDead();
+				}
+			}
 		}
 		else if(x <= 0){
-			System.out.println("in10");
 			if(directionY != NOT_JUMP){
-				System.out.println("in11");
 				clearStates();
 				states[2] = true;
 			}
 			x = 0;
+			if(this.equals(GameLogic.getPlayer1())){
+				if(GameLogic.getHPPlayer1().getHPValue() <= 0){
+					this.setIsDead();
+				}
+			}
+			else{
+				if(GameLogic.getHPPlayer2().getHPValue() <= 0){
+					this.setIsDead();
+				}
+			}
+			
 		}
 	}
 	

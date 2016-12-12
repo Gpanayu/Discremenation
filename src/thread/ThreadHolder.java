@@ -12,7 +12,7 @@ public class ThreadHolder {
 			return false;
 		}
 		
-		for (int i = 0;i < threads.size();i++) {
+		for (int i = 0; i < threads.size();i++) {
 			if (threads.get(i).isAlive()) {
 				return true;
 			}
