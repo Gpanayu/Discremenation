@@ -5,6 +5,7 @@ import javafx.animation.AnimationTimer;
 import javafx.scene.control.Alert;
 import javafx.scene.control.Alert.AlertType;
 import main.Main;
+import sharedObject.RenderableHolder;
  
 
 public class GameLoopUtility {
@@ -17,6 +18,7 @@ public class GameLoopUtility {
 				try{
 					logic.logicUpdate();
 					Main.instance.drawGameScreen();
+					RenderableHolder.getInstance().update();
 					if(GameLogic.getPlayer1().getIsDead() || GameLogic.getPlayer2().getIsDead()){
 						Main.instance.stop();
 						GameLoopUtility.animationTimer.stop();

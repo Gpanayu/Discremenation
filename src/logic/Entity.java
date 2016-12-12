@@ -31,5 +31,4 @@ public abstract class Entity implements IRenderable{
 		// TODO Auto-generated method stub
 		return visible;
 	}
-
 }

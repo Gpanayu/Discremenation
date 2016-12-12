@@ -1,5 +1,7 @@
 package logic;
 
+import java.util.Arrays;
+
 import input.InputUtility;
 import javafx.scene.input.KeyCode;
 import javafx.scene.paint.Color;
@@ -11,7 +13,7 @@ public abstract class Slasher extends Entity{
 	protected int speedX;
 	protected int speedY;
 	protected int accelerationX;
-	protected int accelerationY;
+	protected double accelerationY;
 	protected boolean[] states;
 	protected boolean[] prevStates;
 	
@@ -28,7 +30,7 @@ public abstract class Slasher extends Entity{
 	public static final int DIRECTION_UP = -1;
 	public static final int DIRECTION_DOWN = 1;
 	public static final int NOT_JUMP = 0;
-	public static final int INITIAL_SPEED_X = 5;
+	public static final int INITIAL_SPEED_X = 2;
 	public static final int INITIAL_SPEED_Y = 30;	
 	protected boolean canMove;
 	
@@ -39,18 +41,18 @@ public abstract class Slasher extends Entity{
 		this.directionY = NOT_JUMP;
 		this.speedX = INITIAL_SPEED_X;
 		this.speedY = 0;
-		this.accelerationX = 5;
-		this.accelerationY = 10;
+		this.accelerationX = 3;
+		this.accelerationY = 1.5;
 		states = new boolean[10];
 		states[0] = true;
-		for(int i = 2; i < states.length ; i++){
+		for(int i = 1; i < states.length ; i++){
 			states[i] = false;
 		}
 		this.canMove = true;
 		this.isImmune = false;
 		prevStates = new boolean[10];
 		prevStates[0] = true;
-		for(int i = 2; i < prevStates.length ; i++){
+		for(int i = 1; i < prevStates.length ; i++){
 			prevStates[i] = false;
 		}
 		counter = 0;
@@ -77,7 +79,7 @@ public abstract class Slasher extends Entity{
 					GameLogic.getHPPlayer1().decreaseHP(50);
 					GameLogic.getGaugePlayer1().increaseGauge(1);
 				}
-				else{
+				else {
 					GameLogic.getHPPlayer2().decreaseHP(50);
 					GameLogic.getGaugePlayer2().increaseGauge(1);
 				}
@@ -90,37 +92,28 @@ public abstract class Slasher extends Entity{
 	protected boolean canSlash(Slasher other){
 		if(!this.states[5] && !this.states[4] && !this.states[2]){
 			if(this.directionX == Slasher.DIRECTION_RIGHT){
-				if(((this.x + ConfigurableOption.HIT_X < other.x + ConfigurableOption.DAMAGE_X &&
-						this.x + ConfigurableOption.HIT_X + ConfigurableOption.HIT_WIDTH < other.x + ConfigurableOption.DAMAGE_X + ConfigurableOption.DAMAGE_WIDTH) ||
-					(other.x + ConfigurableOption.DAMAGE_X < this.x + ConfigurableOption.HIT_X &&
-						this.x + ConfigurableOption.HIT_X + ConfigurableOption.HIT_WIDTH < other.x + ConfigurableOption.DAMAGE_X + ConfigurableOption.DAMAGE_WIDTH) ||
-					(this.x + ConfigurableOption.DAMAGE_X < other.x + ConfigurableOption.HIT_X &&
-						other.x + ConfigurableOption.DAMAGE_X + ConfigurableOption.DAMAGE_WIDTH < this.x + ConfigurableOption.HIT_X + ConfigurableOption.HIT_WIDTH))&&
-					((this.y + ConfigurableOption.HIT_Y < other.y + ConfigurableOption.DAMAGE_Y &&
-						this.y + ConfigurableOption.HIT_Y + ConfigurableOption.HIT_HEIGHT < other.y +ConfigurableOption.DAMAGE_Y + ConfigurableOption.DAMAGE_HEIGHT) || 
-						(other.y + ConfigurableOption.DAMAGE_Y < this.y + ConfigurableOption.HIT_Y &&
-						this.y + ConfigurableOption.HIT_Y + ConfigurableOption.HIT_HEIGHT < other.y + ConfigurableOption.DAMAGE_Y + ConfigurableOption.DAMAGE_HEIGHT) ||
-					(this.y + ConfigurableOption.DAMAGE_Y < other.y + ConfigurableOption.HIT_Y &&
-						other.y + ConfigurableOption.DAMAGE_Y + ConfigurableOption.DAMAGE_HEIGHT < this.y + ConfigurableOption.HIT_Y + ConfigurableOption.HIT_HEIGHT))){
+				if(((this.x + ConfigurableOption.DAMAGE_X <= other.x + ConfigurableOption.HIT_X + ConfigurableOption.HIT_WIDTH
+						&& other.x + ConfigurableOption.HIT_X + ConfigurableOption.HIT_WIDTH <= this.x + ConfigurableOption.DAMAGE_X+ ConfigurableOption.DAMAGE_WIDTH) 
+						|| (this.x + ConfigurableOption.DAMAGE_X <= other.x + ConfigurableOption.HIT_X
+								&& other.x + ConfigurableOption.HIT_X <= this.x + ConfigurableOption.DAMAGE_X+ ConfigurableOption.DAMAGE_WIDTH))
+						&& ((this.y + ConfigurableOption.DAMAGE_Y <= other.y + ConfigurableOption.HIT_Y + ConfigurableOption.HIT_HEIGHT
+								&& other.y + ConfigurableOption.HIT_Y + ConfigurableOption.HIT_HEIGHT <= this.y + ConfigurableOption.DAMAGE_Y+ ConfigurableOption.DAMAGE_HEIGHT) 
+								|| (this.y + ConfigurableOption.DAMAGE_Y <= other.y + ConfigurableOption.HIT_Y
+										&& other.y + ConfigurableOption.HIT_Y <= this.y + ConfigurableOption.DAMAGE_Y+ ConfigurableOption.DAMAGE_HEIGHT))){
 				
 					return true;
 				}
 				return false;
 			}
 			else{
-				if(((this.x + ConfigurableOption.HIT_X < other.x + ConfigurableOption.DAMAGE_X - ConfigurableOption.HIT_WIDTH - ConfigurableOption.DAMAGE_WIDTH &&
-						this.x + ConfigurableOption.HIT_X + ConfigurableOption.HIT_WIDTH < other.x + ConfigurableOption.DAMAGE_X - ConfigurableOption.HIT_WIDTH) ||
-					(other.x + ConfigurableOption.DAMAGE_X - ConfigurableOption.HIT_WIDTH - ConfigurableOption.DAMAGE_WIDTH < this.x + ConfigurableOption.HIT_X &&
-						this.x + ConfigurableOption.HIT_X + ConfigurableOption.HIT_WIDTH < other.x + ConfigurableOption.DAMAGE_X - ConfigurableOption.HIT_WIDTH) ||
-					(this.x + ConfigurableOption.DAMAGE_X - ConfigurableOption.HIT_WIDTH - ConfigurableOption.DAMAGE_WIDTH < other.x + ConfigurableOption.HIT_X &&
-						other.x + ConfigurableOption.DAMAGE_X + ConfigurableOption.HIT_WIDTH < this.x + ConfigurableOption.HIT_X + ConfigurableOption.HIT_WIDTH))&&
-					((this.y + ConfigurableOption.HIT_Y < other.y + ConfigurableOption.DAMAGE_Y &&
-						this.y + ConfigurableOption.HIT_Y + ConfigurableOption.HIT_HEIGHT < other.y +ConfigurableOption.DAMAGE_Y + ConfigurableOption.DAMAGE_HEIGHT) || 
-						(other.y + ConfigurableOption.DAMAGE_Y < this.y + ConfigurableOption.HIT_Y &&
-						this.y + ConfigurableOption.HIT_Y + ConfigurableOption.HIT_HEIGHT < other.y + ConfigurableOption.DAMAGE_Y + ConfigurableOption.DAMAGE_HEIGHT) ||
-					(this.y + ConfigurableOption.DAMAGE_Y < other.y + ConfigurableOption.HIT_Y &&
-						other.y + ConfigurableOption.DAMAGE_Y + ConfigurableOption.DAMAGE_HEIGHT < this.y + ConfigurableOption.HIT_Y + ConfigurableOption.HIT_HEIGHT))){
-				
+				if(((this.x + ConfigurableOption.DAMAGE_X - ConfigurableOption.HIT_WIDTH - ConfigurableOption.DAMAGE_WIDTH <= other.x + ConfigurableOption.HIT_X + ConfigurableOption.HIT_WIDTH
+						&& other.x + ConfigurableOption.HIT_X + ConfigurableOption.HIT_WIDTH <= this.x + ConfigurableOption.DAMAGE_X - ConfigurableOption.HIT_WIDTH) 
+						|| (this.x + ConfigurableOption.DAMAGE_X - ConfigurableOption.HIT_WIDTH - ConfigurableOption.DAMAGE_WIDTH <= other.x + ConfigurableOption.HIT_X
+								&& other.x + ConfigurableOption.HIT_X <= this.x + ConfigurableOption.DAMAGE_X - ConfigurableOption.HIT_WIDTH))
+						&& ((this.y + ConfigurableOption.DAMAGE_Y <= other.y + ConfigurableOption.HIT_Y + ConfigurableOption.HIT_HEIGHT
+								&& other.y + ConfigurableOption.HIT_Y + ConfigurableOption.HIT_HEIGHT <= this.y + ConfigurableOption.DAMAGE_Y+ ConfigurableOption.DAMAGE_HEIGHT) 
+								|| (this.y + ConfigurableOption.DAMAGE_Y <= other.y + ConfigurableOption.HIT_Y
+										&& other.y + ConfigurableOption.HIT_Y <= this.y + ConfigurableOption.DAMAGE_Y+ ConfigurableOption.DAMAGE_HEIGHT))){
 					return true;
 				}
 				return false;
@@ -144,7 +137,7 @@ public abstract class Slasher extends Entity{
 		else{
 			x += speedX * directionX;
 			y += speedY * directionY;
-			speedY += directionY;
+			speedY += directionY * accelerationY;
 			if(speedY == 0){
 				directionY = DIRECTION_DOWN;
 				clearStates();
@@ -197,21 +190,84 @@ public abstract class Slasher extends Entity{
 				if(e instanceof Slasher && !e.equals(this)){
 					Blinker b = (Blinker)e;
 					this.directionX = -b.directionX;
-					speedX = INITIAL_SPEED_X;
+					speedX = 5;
+					if(prevStates[4]){
+						speedY = 20;//discuss later
+						speedX = 10;
+						directionY = DIRECTION_UP;
+					}
+					clearStates();
+					states[2] = true;
 				}
 			}
 			isImmune = true;
 		}
 		x += speedX * (-directionX);
+		y += speedY * directionY;
+		speedY += directionY * accelerationY;
+		if(speedY == 0 && directionY != NOT_JUMP){
+			System.out.println("in1");
+			directionY = DIRECTION_DOWN;
+			clearStates();
+			states[2] = true;
+			this.canMove = false;
+		}
+		if(y >= ConfigurableOption.SCREEN_HEIGHT - ConfigurableOption.FLOOR && directionY != NOT_JUMP){
+			System.out.println("in2");
+			y = ConfigurableOption.SCREEN_HEIGHT - ConfigurableOption.FLOOR;
+			directionY = NOT_JUMP;
+			speedY = 0;
+			idle();
+			counter = 0;
+			this.canMove = true;
+			if(this.equals(GameLogic.getPlayer1())){
+				System.out.println("in6");
+				if(GameLogic.getHPPlayer1().getHPValue() <= 0){
+					System.out.println("in7");
+					this.setIsDead();
+				}
+			}
+			else{
+				System.out.println("in8");
+				if(GameLogic.getHPPlayer2().getHPValue() <= 0){
+					System.out.println("in9");
+					this.setIsDead();
+				}
+			}
+		}
+		else if(y < 0){
+			System.out.println("in3");
+			y = 0;
+			clearStates();
+			states[2] = true;
+			this.canMove = false;
+		}
 		if(x >= ConfigurableOption.SCREEN_WIDTH - ConfigurableOption.HIT_WIDTH){
+			System.out.println("in4");
+//			if(y >= ConfigurableOption.SCREEN_HEIGHT - ConfigurableOption.FLOOR && directionY != NOT_JUMP){
+//				System.out.println("in5");
+//				y = ConfigurableOption.SCREEN_HEIGHT - ConfigurableOption.FLOOR;
+//				directionY = NOT_JUMP;
+//				speedY = 0;
+//				idle();
+//				counter = 0;
+//				this.canMove = true;
+//			}
+			if(directionY != NOT_JUMP){
+				clearStates();
+				states[2] = true;
+			}
 			x = ConfigurableOption.SCREEN_WIDTH - ConfigurableOption.HIT_WIDTH;
 		}
 		else if(x <= 0){
+			System.out.println("in10");
+			if(directionY != NOT_JUMP){
+				System.out.println("in11");
+				clearStates();
+				states[2] = true;
+			}
 			x = 0;
 		}
-		clearStates();
-		states[2] = true;
-		this.canMove = false;
 	}
 	
 	protected void idle(){
@@ -256,7 +312,7 @@ public abstract class Slasher extends Entity{
 		this.accelerationX = accelerationX;
 	}
 
-	public int getAccelerationY() {
+	public double getAccelerationY() {
 		return accelerationY;
 	}
 
@@ -270,9 +326,9 @@ public abstract class Slasher extends Entity{
 			b.updateAnimation();
 			if(states[2]){
 				counter += 1;
-				if(counter >= stunTime){
+				if(counter >= stunTime && directionY == NOT_JUMP){
 					if(b.equals(GameLogic.getPlayer1())){
-						if(GameLogic.getHPPlayer1().getHPValue() == 0){
+						if(GameLogic.getHPPlayer1().getHPValue() <= 0){
 							b.setIsDead();
 						}
 						else{
@@ -281,7 +337,7 @@ public abstract class Slasher extends Entity{
 						}
 					}
 					else{
-						if(GameLogic.getHPPlayer2().getHPValue() == 0){
+						if(GameLogic.getHPPlayer2().getHPValue() <= 0){
 							b.setIsDead();
 						}
 						else{
@@ -333,16 +389,35 @@ public abstract class Slasher extends Entity{
 					counter = 0;
 				}
 			}
-			else if(InputUtility.getKeyPressed(KeyCode.SPACE) && !b.isBlack() && b.canMove || prevStates[3]){
+			else if(InputUtility.getKeyTriggered(KeyCode.SPACE) && !b.isBlack() && b.canMove || (prevStates[3] && !b.isBlack())){
 				b.slash(GameLogic.getPlayer2());
 			}
-			else if(InputUtility.getKeyPressed(KeyCode.ENTER) && b.isBlack() && b.canMove || prevStates[3]){
+			else if(InputUtility.getKeyTriggered(KeyCode.ENTER) && b.isBlack() && b.canMove || (prevStates[3] && b.isBlack())){
 				b.slash(GameLogic.getPlayer1());
 			}
-			else if(((InputUtility.getKeyPressed(KeyCode.ALT) && !b.isBlack()) || (InputUtility.getKeyPressed(KeyCode.BACK_SLASH) && b.isBlack())) && b.canMove){
-//				use special power
+			else if(((InputUtility.getKeyTriggered(KeyCode.ALT) && !b.isBlack()) || (InputUtility.getKeyTriggered(KeyCode.BACK_SLASH) && b.isBlack())) && b.canMove){
+				if(this.equals(GameLogic.getPlayer1())){
+					if(GameLogic.getGaugePlayer1().getGaugeValue() >= 250){
+						x += directionX * ConfigurableOption.SCREEN_WIDTH;
+						GameLogic.getGaugePlayer1().decreaseGuage(250);
+					}
+				}
+				else{
+					if(GameLogic.getGaugePlayer2().getGaugeValue() >= 250){
+						x += directionX * ConfigurableOption.SCREEN_WIDTH;
+						GameLogic.getGaugePlayer2().decreaseGuage(250);
+					}
+				}
+				if(x >= ConfigurableOption.SCREEN_WIDTH - ConfigurableOption.HIT_WIDTH){
+					x = ConfigurableOption.SCREEN_WIDTH - ConfigurableOption.HIT_WIDTH;
+					idle();
+				}
+				else if(x <= 0){
+					x = 0;
+					idle();
+				}
 			}
-			else if(!prevStates[5]){
+			else if(!prevStates[5] && !states[2]){
 				idle();
 			}
 		}
@@ -355,6 +430,16 @@ public abstract class Slasher extends Entity{
 		canMove = false;
 		speedX = 0;
 		speedY = 0;
+		for(Entity e : GameLogic.getGameObjectContainer()){
+			if(e instanceof Slasher && !e.equals(this)){
+				if(e.equals(GameLogic.getPlayer1())){
+					InputUtility.setKeyPressed(KeyCode.SPACE, false);
+				}
+				else{
+					InputUtility.setKeyPressed(KeyCode.ENTER, false);
+				}
+			}
+		}
 	}
 	
 	protected boolean getIsDead(){

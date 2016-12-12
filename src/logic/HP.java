@@ -21,7 +21,6 @@ public class HP extends Entity {
 		}
 		if (this.HPValue - amount <= 0 ){
 			this.HPValue = 0;
-			this.slasher.setIsDead();
 		}
 	}
 	

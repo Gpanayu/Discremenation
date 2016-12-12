@@ -51,8 +51,8 @@ public class Blinker extends Slasher{
   		this.frameDelayCount = 0;
   		super.runTime = 6;
   		super.slashTime = 5;
-  		super.stunTime = 10;
-  		super.immuneTime = 20;
+  		super.stunTime = 30;
+  		super.immuneTime = 35;
 		
 	}
 	
@@ -156,7 +156,7 @@ public class Blinker extends Slasher{
 	@Override
 	protected void useSkill() {
 		// TODO Auto-generated method stub
-		x += directionX * (2/3) * ConfigurableOption.SCREEN_WIDTH;
+		x += directionX * ConfigurableOption.SCREEN_WIDTH;
 		if(x >= ConfigurableOption.SCREEN_WIDTH - ConfigurableOption.HIT_WIDTH){
 			x = ConfigurableOption.SCREEN_WIDTH - ConfigurableOption.HIT_WIDTH;
 		}

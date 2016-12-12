@@ -3,12 +3,14 @@ package logic;
 import java.util.ArrayList;
 import java.util.List;
 
+import input.InputUtility;
 import javafx.application.Platform;
 import javafx.scene.control.Alert;
 import javafx.scene.control.Alert.AlertType;
 import javafx.scene.paint.Color;
 import lib.ConfigurableOption;
 import main.Main;
+import sharedObject.IRenderable;
 import sharedObject.RenderableHolder;
 import thread.ThreadHolder;
 
@@ -88,8 +90,12 @@ public class GameLogic {
 					Main.instance.toggleScene();
 				}
 			});
-			for(Entity e : gameObjectContainer){
-				e.destroyed = true;
+			gameObjectContainer.clear();
+			try {
+				Main.instance.stop();
+			} catch (Exception e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
 			}
 		}
 		else if(GameLogic.getPlayer2().getIsDead()){
@@ -104,8 +110,12 @@ public class GameLogic {
 					Main.instance.toggleScene();
 				}
 			});
-			for(Entity e : gameObjectContainer){
-				e.destroyed = true;
+			gameObjectContainer.clear();
+			try {
+				Main.instance.stop();
+			} catch (Exception e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
 			}
 		}
 		else if(GameLogic.getPlayer1().getIsDead()){
@@ -120,10 +130,15 @@ public class GameLogic {
 					Main.instance.toggleScene();
 				}
 			});
-			for(Entity e : gameObjectContainer){
-				e.destroyed = true;
+			gameObjectContainer.clear();
+			try {
+				Main.instance.stop();
+			} catch (Exception e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
 			}
 		}
+		InputUtility.updateInputState();
 	}
 	
 	public static List<Entity> getGameObjectContainer(){

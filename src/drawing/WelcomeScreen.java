@@ -54,9 +54,10 @@ public class WelcomeScreen extends Pane{
 		this.setOnKeyPressed(new EventHandler<KeyEvent>(){
 			public void handle(KeyEvent event){
 				if(event.getCode() == KeyCode.ENTER){
+					RenderableHolder.getInstance().getEntities().clear();
 					gameLogic = new GameLogic();
-					GameLoopUtility gameLoop = new GameLoopUtility();
-					gameLoop.runGameLoop(gameLogic);
+					new GameLoopUtility();
+					GameLoopUtility.runGameLoop(gameLogic);
 					Main.instance.toggleScene();
 				}
 			}

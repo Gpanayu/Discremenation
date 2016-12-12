@@ -35,10 +35,11 @@ public class GameScreen extends Pane{
 					|| event.getCode() == KeyCode.RIGHT || event.getCode() == KeyCode.ENTER
 					|| event.getCode() == KeyCode.BACK_SLASH){
 				
+				if (!InputUtility.getKeyPressed(event.getCode()))
+					InputUtility.setKeyTriggered(event.getCode(), true);
 				InputUtility.setKeyPressed(event.getCode(), true);
 				
 			}
-			InputUtility.setKeyPressed(event.getCode(), true);
 		});
 
 		this.setOnKeyReleased((KeyEvent event) -> {
@@ -49,7 +50,6 @@ public class GameScreen extends Pane{
 					|| event.getCode() == KeyCode.BACK_SLASH){
 				
 				InputUtility.setKeyPressed(event.getCode(), false);
-				
 			}
 		});
 
@@ -63,10 +63,6 @@ public class GameScreen extends Pane{
 				InputUtility.mouseLeftRelease();
 		});
 		
-		this.canvas.setOnMouseClicked((event) -> {
-			Main.instance.toggleScene();
-		});
-
 		this.canvas.setOnMouseEntered((MouseEvent event) -> {
 			InputUtility.mouseOnScreen = true;
 		});

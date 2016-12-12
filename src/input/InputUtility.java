@@ -12,6 +12,7 @@ public class InputUtility {
 	private static boolean isLeftClickedLastTick = false;
 
 	private static ArrayList<KeyCode> keyPressed = new ArrayList<>(); 
+	private static ArrayList<KeyCode> keyTriggered = new ArrayList<>();
 	
 	public static boolean getKeyPressed(KeyCode keycode) {
 		return keyPressed.contains(keycode);
@@ -24,6 +25,20 @@ public class InputUtility {
 		}else{
 			keyPressed.remove(keycode);
 		}
+	}
+	public static void setKeyTriggered(KeyCode keycode, boolean pressed) {
+		if(!pressed && getKeyTriggered(keycode)){
+			keyTriggered.remove(keycode);
+		}
+		else if(pressed && !getKeyTriggered(keycode)){
+			keyTriggered.add(keycode);
+		}
+	}
+	public static boolean getKeyTriggered(KeyCode keycode) {
+		if(keyTriggered.contains(keycode)){
+			return true;
+		}
+		return false;
 	}
 	
 	public static void mouseLeftDown(){
@@ -41,5 +56,6 @@ public class InputUtility {
 	
 	public static void updateInputState(){
 		isLeftClickedLastTick = false;
+		keyTriggered.clear();
 	}
 }
