@@ -41,6 +41,10 @@ public class Gauge extends Entity{
 	public void setGaugeValue(double gaugeValue) {
 		this.gaugeValue = gaugeValue;
 	}
+	
+	public Slasher getSlasher(){
+		return slasher;
+	}
 
 	@Override
 	public void draw(GraphicsContext gc) {

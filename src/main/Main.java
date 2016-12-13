@@ -12,7 +12,6 @@ import javafx.scene.Scene;
 import javafx.scene.layout.StackPane;
 import javafx.stage.Stage;
 import javafx.stage.WindowEvent;
-import logic.GameLogic;
 import sharedObject.RenderableHolder;
 import thread.ThreadHolder;
 
@@ -24,7 +23,6 @@ public class Main extends Application {
 	private WelcomeScreen welcomeScreen;
 	private Scene welcomeScene;
 	private Stage theStage;
-	private GameLogic gameLogic;
 	
 	@Override
 	public void start(Stage primaryStage) {

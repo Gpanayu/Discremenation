@@ -1,9 +1,6 @@
 package logic;
 
-import input.InputUtility;
 import javafx.animation.AnimationTimer;
-import javafx.scene.control.Alert;
-import javafx.scene.control.Alert.AlertType;
 import main.Main;
 import sharedObject.RenderableHolder;
  

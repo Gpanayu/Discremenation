@@ -1,10 +1,7 @@
 package logic;
 
-import java.util.Arrays;
-
 import input.InputUtility;
 import javafx.scene.input.KeyCode;
-import javafx.scene.paint.Color;
 import lib.ConfigurableOption;
 
 public abstract class Slasher extends Entity{
@@ -338,24 +335,9 @@ public abstract class Slasher extends Entity{
 			if(states[2]){
 				counter += 1;
 				if(counter >= stunTime && directionY == NOT_JUMP){
-					if(b.equals(GameLogic.getPlayer1())){
-						if(GameLogic.getHPPlayer1().getHPValue() <= 0){
-							b.setIsDead();
-						}
-						else{
-							idle();
-							counter = 0;
-						}
-					}
-					else{
-						if(GameLogic.getHPPlayer2().getHPValue() <= 0){
-							b.setIsDead();
-						}
-						else{
-							idle();
-							counter = 0;
-						}
-					}
+					idle();
+					counter = 0;
+					controlIsDead();
 				}
 				else{
 					stun();
@@ -377,62 +359,47 @@ public abstract class Slasher extends Entity{
 					immuneCounter = 0;
 				}
 			}
-			if(((InputUtility.getKeyPressed(KeyCode.W) && !b.isBlack()) || (InputUtility.getKeyPressed(KeyCode.UP) && b.isBlack())) && b.canMove || b.prevStates[4]){
-				b.jump();
-			}
-			else if(((InputUtility.getKeyPressed(KeyCode.A) && !b.isBlack()) || (InputUtility.getKeyPressed(KeyCode.LEFT) && b.isBlack())) && b.canMove){
-				if(directionX != Slasher.DIRECTION_LEFT){
-					directionX = Slasher.DIRECTION_LEFT;
-					idle();
-				}
-				else{
-					run();
-					counter = 0;
-				}
-			}
-			else if(((InputUtility.getKeyPressed(KeyCode.D) && !b.isBlack()) || (InputUtility.getKeyPressed(KeyCode.RIGHT) && b.isBlack())) && b.canMove){
-				if(directionX != Slasher.DIRECTION_RIGHT){
-					directionX = Slasher.DIRECTION_RIGHT;
-					idle();
-				}
-				else{
-					run();
-					counter = 0;
-				}
-			}
-			else if(InputUtility.getKeyTriggered(KeyCode.SPACE) && !b.isBlack() && b.canMove || (prevStates[3] && !b.isBlack())){
-				b.slash(GameLogic.getPlayer2());
-			}
-			else if(InputUtility.getKeyTriggered(KeyCode.ENTER) && b.isBlack() && b.canMove || (prevStates[3] && b.isBlack())){
-				b.slash(GameLogic.getPlayer1());
-			}
-			else if(((InputUtility.getKeyTriggered(KeyCode.ALT) && !b.isBlack()) || (InputUtility.getKeyTriggered(KeyCode.BACK_SLASH) && b.isBlack())) && b.canMove){
-				if(this.equals(GameLogic.getPlayer1())){
-					if(GameLogic.getGaugePlayer1().getGaugeValue() >= 250){
-						x += directionX * ConfigurableOption.SCREEN_WIDTH;
-						GameLogic.getGaugePlayer1().decreaseGuage(250);
-					}
-				}
-				else{
-					if(GameLogic.getGaugePlayer2().getGaugeValue() >= 250){
-						x += directionX * ConfigurableOption.SCREEN_WIDTH;
-						GameLogic.getGaugePlayer2().decreaseGuage(250);
-					}
-				}
-				if(x >= ConfigurableOption.SCREEN_WIDTH - ConfigurableOption.HIT_WIDTH){
-					x = ConfigurableOption.SCREEN_WIDTH - ConfigurableOption.HIT_WIDTH;
-					idle();
-				}
-				else if(x <= 0){
-					x = 0;
-					idle();
-				}
-			}
-			else if(!prevStates[5] && !states[2]){
-				idle();
-			}
+			inputAndLoopControl();
 		}
 		prevStates = states;
+	}
+	
+	private void inputAndLoopControl(){
+		if(((InputUtility.getKeyPressed(KeyCode.W) && this.equals(GameLogic.getPlayer1())) || (InputUtility.getKeyPressed(KeyCode.UP) && this.equals(GameLogic.getPlayer2()))) && canMove || prevStates[4]){
+			jump();
+		}
+		else if(((InputUtility.getKeyPressed(KeyCode.A) && this.equals(GameLogic.getPlayer1())) || (InputUtility.getKeyPressed(KeyCode.LEFT) && this.equals(GameLogic.getPlayer2()))) && canMove){
+			if(directionX != Slasher.DIRECTION_LEFT){
+				directionX = Slasher.DIRECTION_LEFT;
+				idle();
+			}
+			else{
+				run();
+				counter = 0;
+			}
+		}
+		else if(((InputUtility.getKeyPressed(KeyCode.D) && this.equals(GameLogic.getPlayer1())) || (InputUtility.getKeyPressed(KeyCode.RIGHT) && this.equals(GameLogic.getPlayer2()))) && canMove){
+			if(directionX != Slasher.DIRECTION_RIGHT){
+				directionX = Slasher.DIRECTION_RIGHT;
+				idle();
+			}
+			else{
+				run();
+				counter = 0;
+			}
+		}
+		else if(InputUtility.getKeyTriggered(KeyCode.SPACE) && this.equals(GameLogic.getPlayer1()) && canMove || (prevStates[3] && this.equals(GameLogic.getPlayer1()))){
+			slash(GameLogic.getPlayer2());
+		}
+		else if(InputUtility.getKeyTriggered(KeyCode.ENTER) && this.equals(GameLogic.getPlayer2()) && canMove || (prevStates[3] && this.equals(GameLogic.getPlayer2()))){
+			slash(GameLogic.getPlayer1());
+		}
+		else if(((InputUtility.getKeyTriggered(KeyCode.ALT) && this.equals(GameLogic.getPlayer1())) || (InputUtility.getKeyTriggered(KeyCode.BACK_SLASH) && this.equals(GameLogic.getPlayer2()))) && canMove){
+			useSkill();
+		}
+		else if(!prevStates[5] && !states[2]){
+			idle();
+		}
 	}
 	
 	protected void setIsDead(){

@@ -156,13 +156,25 @@ public class Blinker extends Slasher{
 	@Override
 	protected void useSkill() {
 		// TODO Auto-generated method stub
-		x += directionX * ConfigurableOption.SCREEN_WIDTH;
-		if(x >= ConfigurableOption.SCREEN_WIDTH - ConfigurableOption.HIT_WIDTH){
-			x = ConfigurableOption.SCREEN_WIDTH - ConfigurableOption.HIT_WIDTH;
+		if(this.equals(GameLogic.getPlayer1())){
+			if(GameLogic.getGaugePlayer1().getGaugeValue() >= 250){
+				x += directionX * ConfigurableOption.SCREEN_WIDTH;
+				if(!checkXInBoundary()){
+					setXInBoundary();
+				}
+				idle();
+				GameLogic.getGaugePlayer1().decreaseGuage(250);
+			}
 		}
-		else if(x <= 0){
-			x = 0;
+		else{
+			if(GameLogic.getGaugePlayer2().getGaugeValue() >= 250){
+				x += directionX * ConfigurableOption.SCREEN_WIDTH;
+				if(!checkXInBoundary()){
+					setXInBoundary();
+				}
+				idle();
+				GameLogic.getGaugePlayer2().decreaseGuage(250);
+			}
 		}
-		idle();
 	}
 }
