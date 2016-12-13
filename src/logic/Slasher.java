@@ -91,29 +91,33 @@ public abstract class Slasher extends Entity{
 	
 	protected boolean canSlash(Slasher other){
 		if(!this.states[5] && !this.states[4] && !this.states[2]){
+			double rightDirectionLeftDamageIndent = ConfigurableOption.DAMAGE_X;
+			double rightDirectionRightDamageIndent = ConfigurableOption.DAMAGE_X + ConfigurableOption.DAMAGE_WIDTH;
+			double leftDirectionLeftDamageIndent = ConfigurableOption.DAMAGE_X - ConfigurableOption.HIT_WIDTH - ConfigurableOption.DAMAGE_WIDTH;
+			double leftDirectionRightDamageIndent = ConfigurableOption.DAMAGE_X - ConfigurableOption.HIT_WIDTH;
+			double leftHitIndent = ConfigurableOption.HIT_X;
+			double rightHitIndent = ConfigurableOption.HIT_X + ConfigurableOption.HIT_WIDTH;
+			double topDamageIndent = ConfigurableOption.DAMAGE_Y;
+			double bottomDamageIndent = ConfigurableOption.DAMAGE_Y + ConfigurableOption.DAMAGE_HEIGHT;
+			double topHitIndent = ConfigurableOption.HIT_Y;
+			double bottomHitIndent = ConfigurableOption.HIT_Y + ConfigurableOption.HIT_HEIGHT;
+			
 			if(this.directionX == Slasher.DIRECTION_RIGHT){
-				if(((this.x + ConfigurableOption.DAMAGE_X <= other.x + ConfigurableOption.HIT_X + ConfigurableOption.HIT_WIDTH
-						&& other.x + ConfigurableOption.HIT_X + ConfigurableOption.HIT_WIDTH <= this.x + ConfigurableOption.DAMAGE_X+ ConfigurableOption.DAMAGE_WIDTH) 
-						|| (this.x + ConfigurableOption.DAMAGE_X <= other.x + ConfigurableOption.HIT_X
-								&& other.x + ConfigurableOption.HIT_X <= this.x + ConfigurableOption.DAMAGE_X+ ConfigurableOption.DAMAGE_WIDTH))
-						&& ((this.y + ConfigurableOption.DAMAGE_Y <= other.y + ConfigurableOption.HIT_Y + ConfigurableOption.HIT_HEIGHT
-								&& other.y + ConfigurableOption.HIT_Y + ConfigurableOption.HIT_HEIGHT <= this.y + ConfigurableOption.DAMAGE_Y+ ConfigurableOption.DAMAGE_HEIGHT) 
-								|| (this.y + ConfigurableOption.DAMAGE_Y <= other.y + ConfigurableOption.HIT_Y
-										&& other.y + ConfigurableOption.HIT_Y <= this.y + ConfigurableOption.DAMAGE_Y+ ConfigurableOption.DAMAGE_HEIGHT))){
+				if(((this.x + rightDirectionLeftDamageIndent <= other.x + rightHitIndent && other.x + rightHitIndent <= this.x + rightDirectionRightDamageIndent) 
+					|| (this.x + rightDirectionLeftDamageIndent <= other.x + leftHitIndent && other.x + leftHitIndent <= this.x + rightDirectionRightDamageIndent))
+					&& ((this.y + topDamageIndent <= other.y + bottomHitIndent && other.y + bottomHitIndent <= this.y + bottomDamageIndent) 
+					|| (this.y + topDamageIndent <= other.y + topHitIndent && other.y + topHitIndent <= this.y + bottomDamageIndent))){
 				
 					return true;
 				}
 				return false;
 			}
 			else{
-				if(((this.x + ConfigurableOption.DAMAGE_X - ConfigurableOption.HIT_WIDTH - ConfigurableOption.DAMAGE_WIDTH <= other.x + ConfigurableOption.HIT_X + ConfigurableOption.HIT_WIDTH
-						&& other.x + ConfigurableOption.HIT_X + ConfigurableOption.HIT_WIDTH <= this.x + ConfigurableOption.DAMAGE_X - ConfigurableOption.HIT_WIDTH) 
-						|| (this.x + ConfigurableOption.DAMAGE_X - ConfigurableOption.HIT_WIDTH - ConfigurableOption.DAMAGE_WIDTH <= other.x + ConfigurableOption.HIT_X
-								&& other.x + ConfigurableOption.HIT_X <= this.x + ConfigurableOption.DAMAGE_X - ConfigurableOption.HIT_WIDTH))
-						&& ((this.y + ConfigurableOption.DAMAGE_Y <= other.y + ConfigurableOption.HIT_Y + ConfigurableOption.HIT_HEIGHT
-								&& other.y + ConfigurableOption.HIT_Y + ConfigurableOption.HIT_HEIGHT <= this.y + ConfigurableOption.DAMAGE_Y+ ConfigurableOption.DAMAGE_HEIGHT) 
-								|| (this.y + ConfigurableOption.DAMAGE_Y <= other.y + ConfigurableOption.HIT_Y
-										&& other.y + ConfigurableOption.HIT_Y <= this.y + ConfigurableOption.DAMAGE_Y+ ConfigurableOption.DAMAGE_HEIGHT))){
+				if(((this.x + leftDirectionLeftDamageIndent <= other.x + rightHitIndent	&& other.x + rightHitIndent <= this.x + leftDirectionRightDamageIndent) 
+					|| (this.x + leftDirectionLeftDamageIndent <= other.x + leftHitIndent && other.x + leftHitIndent <= this.x + leftDirectionRightDamageIndent))
+					&& ((this.y + topDamageIndent <= other.y + bottomHitIndent && other.y + bottomHitIndent <= this.y + bottomDamageIndent) 
+					|| (this.y + topDamageIndent <= other.y + topHitIndent && other.y + topHitIndent <= this.y + bottomDamageIndent))){
+					
 					return true;
 				}
 				return false;
@@ -144,24 +148,23 @@ public abstract class Slasher extends Entity{
 				states[4] = true;
 				this.canMove = false;
 			}
-			if(y >= ConfigurableOption.SCREEN_HEIGHT - ConfigurableOption.FLOOR){
-				y = ConfigurableOption.SCREEN_HEIGHT - ConfigurableOption.FLOOR;
-				directionY = NOT_JUMP;
-				speedY = 0;
-				idle();
-				this.canMove = true;
-			}
-			else if(y < 0){
-				y = 0;
+			
+			if(!checkYInBoundary()){
+				setYInBoundary();
+				canMove = false;
 				clearStates();
 				states[4] = true;
 				this.canMove = false;
+				if(y >= ConfigurableOption.SCREEN_HEIGHT - ConfigurableOption.FLOOR){
+					directionY = NOT_JUMP;
+					speedY = 0;
+					idle();
+					canMove = true;
+					
+				}
 			}
-			if(x >= ConfigurableOption.SCREEN_WIDTH - ConfigurableOption.HIT_WIDTH){
-				x = ConfigurableOption.SCREEN_WIDTH - ConfigurableOption.HIT_WIDTH;
-			}
-			else if(x <= 0){
-				x = 0;
+			if(!checkXInBoundary()){
+				setXInBoundary();
 			}
 		}
 	}
@@ -174,33 +177,29 @@ public abstract class Slasher extends Entity{
 		speedX += accelerationX;
 		clearStates();
 		states[1] = true;
-		if(x >= ConfigurableOption.SCREEN_WIDTH - ConfigurableOption.HIT_WIDTH){
-			x = ConfigurableOption.SCREEN_WIDTH - ConfigurableOption.HIT_WIDTH;
-			idle();
-		}
-		else if(x <= 0){
-			x = 0;
+		if(!checkXInBoundary()){
+			setXInBoundary();
 			idle();
 		}
 	}
 	
 	protected void stun(){
 		if(!prevStates[2]){
-			for(Entity e : GameLogic.getGameObjectContainer()){
-				if(e instanceof Slasher && !e.equals(this)){
-					Blinker b = (Blinker)e;
-					this.directionX = -b.directionX;
-					speedX = 5;
-					if(prevStates[4]){
-						speedY = 20;//discuss later
-						speedX = 10;
-						directionY = DIRECTION_UP;
-					}
-					clearStates();
-					states[2] = true;
-					canMove = false;
-				}
+			speedX = 5;
+			if(this.equals(GameLogic.getPlayer1())){
+				this.directionX = -GameLogic.getPlayer2().directionX;
 			}
+			else{
+				this.directionX = -GameLogic.getPlayer1().directionX;
+			}
+			if(prevStates[4]){
+				speedY = 20;
+				speedX = 10;
+				directionY = DIRECTION_UP;
+			}
+			clearStates();
+			states[2] = true;
+			canMove = false;
 			isImmune = true;
 		}
 		x += speedX * (-directionX);
@@ -212,64 +211,41 @@ public abstract class Slasher extends Entity{
 			states[2] = true;
 			this.canMove = false;
 		}
-		if(y >= ConfigurableOption.SCREEN_HEIGHT - ConfigurableOption.FLOOR && directionY != NOT_JUMP){
-			y = ConfigurableOption.SCREEN_HEIGHT - ConfigurableOption.FLOOR;
-			directionY = NOT_JUMP;
-			speedY = 0;
-			idle();
-			counter = 0;
-			this.canMove = true;
-			if(this.equals(GameLogic.getPlayer1())){
-				if(GameLogic.getHPPlayer1().getHPValue() <= 0){
-					this.setIsDead();
-				}
-			}
-			else{
-				if(GameLogic.getHPPlayer2().getHPValue() <= 0){
-					this.setIsDead();
-				}
-			}
-		}
-		else if(y < 0){
-			y = 0;
+		if(!checkYInBoundary()){
+			setYInBoundary();
 			clearStates();
 			states[2] = true;
 			this.canMove = false;
-		}
-		if(x >= ConfigurableOption.SCREEN_WIDTH - ConfigurableOption.HIT_WIDTH){
-			if(directionY != NOT_JUMP){
-				clearStates();
-				states[2] = true;
-			}
-			x = ConfigurableOption.SCREEN_WIDTH - ConfigurableOption.HIT_WIDTH;
-			if(this.equals(GameLogic.getPlayer1())){
-				if(GameLogic.getHPPlayer1().getHPValue() <= 0){
-					this.setIsDead();
-				}
-			}
-			else{
-				if(GameLogic.getHPPlayer2().getHPValue() <= 0){
-					this.setIsDead();
-				}
-			}
-		}
-		else if(x <= 0){
-			if(directionY != NOT_JUMP){
-				clearStates();
-				states[2] = true;
-			}
-			x = 0;
-			if(this.equals(GameLogic.getPlayer1())){
-				if(GameLogic.getHPPlayer1().getHPValue() <= 0){
-					this.setIsDead();
-				}
-			}
-			else{
-				if(GameLogic.getHPPlayer2().getHPValue() <= 0){
-					this.setIsDead();
-				}
+			if(y >= ConfigurableOption.SCREEN_HEIGHT - ConfigurableOption.FLOOR && directionY != NOT_JUMP){
+				directionY = NOT_JUMP;
+				speedY = 0;
+				idle();
+				counter = 0;
+				canMove = true;
+				controlIsDead();
 			}
 			
+		}
+		if(!checkXInBoundary()){
+			if(directionY != NOT_JUMP){
+				clearStates();
+				states[2] = true;
+			}
+			setXInBoundary();
+		}
+
+	}
+	
+	public void controlIsDead(){
+		if(this.equals(GameLogic.getPlayer1())){
+			if(GameLogic.getHPPlayer1().getHPValue() <= 0){
+				this.setIsDead();
+			}
+		}
+		else{
+			if(GameLogic.getHPPlayer2().getHPValue() <= 0){
+				this.setIsDead();
+			}
 		}
 	}
 	
@@ -321,6 +297,38 @@ public abstract class Slasher extends Entity{
 
 	protected void setAccelerationY(int accelerationY) {
 		this.accelerationY = accelerationY;
+	}
+	
+	public boolean checkXInBoundary(){
+		if(x <= 0 || x >= ConfigurableOption.SCREEN_WIDTH - ConfigurableOption.HIT_WIDTH){
+			return false;
+		}
+		return true;
+	}
+
+	public void setXInBoundary(){
+		if(x <= 0){
+			x = 0;
+		}
+		else {
+			x = ConfigurableOption.SCREEN_WIDTH - ConfigurableOption.HIT_WIDTH;
+		}
+	}
+	
+	public boolean checkYInBoundary(){
+		if(y <= 0 || y >= ConfigurableOption.SCREEN_HEIGHT - ConfigurableOption.FLOOR){
+			return false;
+		}
+		return true;
+	}
+	
+	public void setYInBoundary(){
+		if(y <= 0){
+			y = 0;
+		}
+		else {
+			y = ConfigurableOption.SCREEN_HEIGHT - ConfigurableOption.FLOOR;
+		}
 	}
 
 	protected void update(){
