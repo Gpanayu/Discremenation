@@ -3,6 +3,7 @@ package logic;
 import input.InputUtility;
 import javafx.scene.input.KeyCode;
 import lib.ConfigurableOption;
+import sharedObject.RenderableHolder;
 
 public abstract class Slasher extends Entity{
 	protected int directionX;
@@ -27,8 +28,8 @@ public abstract class Slasher extends Entity{
 	public static final int DIRECTION_UP = -1;
 	public static final int DIRECTION_DOWN = 1;
 	public static final int NOT_JUMP = 0;
-	public static final int INITIAL_SPEED_X = 2;
-	public static final int INITIAL_SPEED_Y = 30;	
+	public static final int INITIAL_SPEED_X = 1;
+	public static final int INITIAL_SPEED_Y = 35;	
 	protected boolean canMove;
 	
 	public Slasher(double x, double y, int direction){
@@ -38,16 +39,16 @@ public abstract class Slasher extends Entity{
 		this.directionY = NOT_JUMP;
 		this.speedX = INITIAL_SPEED_X;
 		this.speedY = 0;
-		this.accelerationX = 3;
+		this.accelerationX = 2;
 		this.accelerationY = 1.5;
-		states = new boolean[10];
+		states = new boolean[6];
 		states[0] = true;
 		for(int i = 1; i < states.length ; i++){
 			states[i] = false;
 		}
 		this.canMove = true;
 		this.isImmune = false;
-		prevStates = new boolean[10];
+		prevStates = new boolean[6];
 		prevStates[0] = true;
 		for(int i = 1; i < prevStates.length ; i++){
 			prevStates[i] = false;
@@ -70,15 +71,19 @@ public abstract class Slasher extends Entity{
 	protected void slash(Slasher other){
 		clearStates();
 		states[3] = true;
-		if(canSlash(other) && !other.states[6]){
+	
+		if(canSlash(other) && !other.isImmune){
 			if(!other.isImmune){
 				if(other.equals(GameLogic.getPlayer1())){
 					GameLogic.getHPPlayer1().decreaseHP(50);
-					GameLogic.getGaugePlayer1().increaseGauge(1);
+					GameLogic.getGaugePlayer1().increaseGauge(100);
+					RenderableHolder.getInstance().getSound("hit_sound").play();
+
 				}
 				else {
 					GameLogic.getHPPlayer2().decreaseHP(50);
-					GameLogic.getGaugePlayer2().increaseGauge(1);
+					GameLogic.getGaugePlayer2().increaseGauge(100);
+					RenderableHolder.getInstance().getSound("hit_sound").play();
 				}
 				other.stun();
 			}
@@ -145,8 +150,23 @@ public abstract class Slasher extends Entity{
 				states[4] = true;
 				this.canMove = false;
 			}
-			
 			if(!checkYInBoundary()){
+				setYInBoundary();
+				canMove = false;
+				clearStates();
+				states[4] = true;
+				this.canMove = false;
+				if(y >= ConfigurableOption.SCREEN_HEIGHT - ConfigurableOption.FLOOR){
+					directionY = NOT_JUMP;
+					speedY = 0;
+					idle();
+					canMove = true;
+					
+				}
+			}
+			if(!checkXInBoundary()){
+				setXInBoundary();
+			}if(!checkYInBoundary()){
 				setYInBoundary();
 				canMove = false;
 				clearStates();
@@ -182,7 +202,7 @@ public abstract class Slasher extends Entity{
 	
 	protected void stun(){
 		if(!prevStates[2]){
-			speedX = 5;
+			speedX = 20;
 			if(this.equals(GameLogic.getPlayer1())){
 				this.directionX = -GameLogic.getPlayer2().directionX;
 			}
@@ -203,6 +223,7 @@ public abstract class Slasher extends Entity{
 		y += speedY * directionY;
 		speedY += directionY * accelerationY;
 		if(speedY == 0 && directionY != NOT_JUMP){
+			System.out.println("in1");
 			directionY = DIRECTION_DOWN;
 			clearStates();
 			states[2] = true;
@@ -295,7 +316,7 @@ public abstract class Slasher extends Entity{
 	protected void setAccelerationY(int accelerationY) {
 		this.accelerationY = accelerationY;
 	}
-	
+
 	public boolean checkXInBoundary(){
 		if(x <= 0 || x >= ConfigurableOption.SCREEN_WIDTH - ConfigurableOption.HIT_WIDTH){
 			return false;
@@ -327,7 +348,7 @@ public abstract class Slasher extends Entity{
 			y = ConfigurableOption.SCREEN_HEIGHT - ConfigurableOption.FLOOR;
 		}
 	}
-
+	
 	protected void update(){
 		if(this instanceof Blinker){
 			Blinker b = (Blinker)(this);
@@ -365,10 +386,10 @@ public abstract class Slasher extends Entity{
 	}
 	
 	private void inputAndLoopControl(){
-		if(((InputUtility.getKeyPressed(KeyCode.W) && this.equals(GameLogic.getPlayer1())) || (InputUtility.getKeyPressed(KeyCode.UP) && this.equals(GameLogic.getPlayer2()))) && canMove || prevStates[4]){
+		if(((InputUtility.getKeyPressed(KeyCode.W) && this.equals(GameLogic.getPlayer2())) || (InputUtility.getKeyPressed(KeyCode.UP) && this.equals(GameLogic.getPlayer1()))) && canMove || prevStates[4]){
 			jump();
 		}
-		else if(((InputUtility.getKeyPressed(KeyCode.A) && this.equals(GameLogic.getPlayer1())) || (InputUtility.getKeyPressed(KeyCode.LEFT) && this.equals(GameLogic.getPlayer2()))) && canMove){
+		else if(((InputUtility.getKeyPressed(KeyCode.A) && this.equals(GameLogic.getPlayer2())) || (InputUtility.getKeyPressed(KeyCode.LEFT) && this.equals(GameLogic.getPlayer1()))) && canMove){
 			if(directionX != Slasher.DIRECTION_LEFT){
 				directionX = Slasher.DIRECTION_LEFT;
 				idle();
@@ -378,7 +399,7 @@ public abstract class Slasher extends Entity{
 				counter = 0;
 			}
 		}
-		else if(((InputUtility.getKeyPressed(KeyCode.D) && this.equals(GameLogic.getPlayer1())) || (InputUtility.getKeyPressed(KeyCode.RIGHT) && this.equals(GameLogic.getPlayer2()))) && canMove){
+		else if(((InputUtility.getKeyPressed(KeyCode.D) && this.equals(GameLogic.getPlayer2())) || (InputUtility.getKeyPressed(KeyCode.RIGHT) && this.equals(GameLogic.getPlayer1()))) && canMove){
 			if(directionX != Slasher.DIRECTION_RIGHT){
 				directionX = Slasher.DIRECTION_RIGHT;
 				idle();
@@ -388,13 +409,15 @@ public abstract class Slasher extends Entity{
 				counter = 0;
 			}
 		}
-		else if(InputUtility.getKeyTriggered(KeyCode.SPACE) && this.equals(GameLogic.getPlayer1()) && canMove || (prevStates[3] && this.equals(GameLogic.getPlayer1()))){
-			slash(GameLogic.getPlayer2());
-		}
-		else if(InputUtility.getKeyTriggered(KeyCode.ENTER) && this.equals(GameLogic.getPlayer2()) && canMove || (prevStates[3] && this.equals(GameLogic.getPlayer2()))){
+		else if(InputUtility.getKeyTriggered(KeyCode.SPACE) && this.equals(GameLogic.getPlayer2()) && canMove || (prevStates[3] && this.equals(GameLogic.getPlayer2()))){
 			slash(GameLogic.getPlayer1());
+			RenderableHolder.getInstance().getSound("slash_sound").play();
 		}
-		else if(((InputUtility.getKeyTriggered(KeyCode.ALT) && this.equals(GameLogic.getPlayer1())) || (InputUtility.getKeyTriggered(KeyCode.BACK_SLASH) && this.equals(GameLogic.getPlayer2()))) && canMove){
+		else if(InputUtility.getKeyTriggered(KeyCode.ENTER) && this.equals(GameLogic.getPlayer1()) && canMove || (prevStates[3] && this.equals(GameLogic.getPlayer1()))){
+			slash(GameLogic.getPlayer2());
+			RenderableHolder.getInstance().getSound("slash_sound").play();
+		}
+		else if(((InputUtility.getKeyTriggered(KeyCode.ALT) && this.equals(GameLogic.getPlayer2())) || (InputUtility.getKeyTriggered(KeyCode.BACK_SLASH) && this.equals(GameLogic.getPlayer1()))) && canMove){
 			useSkill();
 		}
 		else if(!prevStates[5] && !states[2]){
@@ -411,10 +434,10 @@ public abstract class Slasher extends Entity{
 		for(Entity e : GameLogic.getGameObjectContainer()){
 			if(e instanceof Slasher && !e.equals(this)){
 				if(e.equals(GameLogic.getPlayer1())){
-					InputUtility.setKeyPressed(KeyCode.SPACE, false);
+					InputUtility.setKeyPressed(KeyCode.ENTER, false);
 				}
 				else{
-					InputUtility.setKeyPressed(KeyCode.ENTER, false);
+					InputUtility.setKeyPressed(KeyCode.SPACE, false);
 				}
 			}
 		}

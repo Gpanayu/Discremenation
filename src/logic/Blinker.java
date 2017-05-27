@@ -8,7 +8,7 @@ import lib.ConfigurableOption;
 import sharedObject.RenderableHolder;
 
 public class Blinker extends Slasher{
-	private int frameDelay;
+	private int frameDelay = 1;
 	private int frameDelayCount;
 	private boolean isBlack;
 	private boolean visible = false, playing = false;
@@ -51,7 +51,7 @@ public class Blinker extends Slasher{
   		this.frameDelayCount = 0;
   		super.runTime = 6;
   		super.slashTime = 5;
-  		super.stunTime = 30;
+  		super.stunTime = 10;
   		super.immuneTime = 35;
 		
 	}
@@ -63,11 +63,18 @@ public class Blinker extends Slasher{
 	public void updateAnimation() {
 		if(prevStates[1]){ 
 			if(!this.checkSameStates()){
-				currentRunFrame = 0;
-			}
-			currentRunFrame += 1;
-			if(currentRunFrame == runTime){ 
-				currentRunFrame = 0; 
+				   currentRunFrame = 0;
+			  }
+			  if(this.frameDelayCount < this.frameDelay){
+				  this.frameDelayCount ++;
+				  return;
+			  }
+			  else{
+				  currentRunFrame += 1;
+				  this.frameDelayCount = 0;
+				  if(currentRunFrame == runTime){ 
+					  currentRunFrame = 0; 
+				  }
 			}
 		}		
 		else if(prevStates[3]){
@@ -76,12 +83,25 @@ public class Blinker extends Slasher{
 				currentSlashFrame = 0;
 			}
 		}
-		else if(prevStates[4]){
-			currentJumpFrame += 1;
-			if(currentJumpFrame >= 2){
-				currentJumpFrame = 2;
-			}
+		else if(states[4]){
+			if(!this.checkSameStates()){	
+				   currentJumpFrame = 0;
+				   frameDelayCount = 0;
+			  }
+			  if (frameDelayCount < frameDelay){
+				  frameDelayCount ++;
+				  return;
+			  }
+			  else{
+				  currentJumpFrame ++;
+				  if(currentJumpFrame >= 2){
+				  	currentJumpFrame = 2;
+				  }	
+			  }	  	
 		}
+		if(!states[4]){
+			  this.currentJumpFrame = 0;
+		  }
 	}
 
 
@@ -158,6 +178,7 @@ public class Blinker extends Slasher{
 		// TODO Auto-generated method stub
 		if(this.equals(GameLogic.getPlayer1())){
 			if(GameLogic.getGaugePlayer1().getGaugeValue() >= 250){
+				RenderableHolder.getInstance().getSound("blink_sound").play();
 				x += directionX * ConfigurableOption.SCREEN_WIDTH;
 				if(!checkXInBoundary()){
 					setXInBoundary();
@@ -168,6 +189,7 @@ public class Blinker extends Slasher{
 		}
 		else{
 			if(GameLogic.getGaugePlayer2().getGaugeValue() >= 250){
+				RenderableHolder.getInstance().getSound("blink_sound").play();
 				x += directionX * ConfigurableOption.SCREEN_WIDTH;
 				if(!checkXInBoundary()){
 					setXInBoundary();

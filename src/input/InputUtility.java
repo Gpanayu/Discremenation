@@ -58,4 +58,8 @@ public class InputUtility {
 		isLeftClickedLastTick = false;
 		keyTriggered.clear();
 	}
+	public static void  clear(){
+		keyPressed.clear();
+		keyTriggered.clear();
+	}
 }

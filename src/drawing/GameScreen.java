@@ -18,7 +18,7 @@ import sharedObject.IRenderable;
 import sharedObject.RenderableHolder;
 
 public class GameScreen extends Pane{
-	private Canvas canvas;
+	private static Canvas canvas;
 
 	public GameScreen(double width, double height) {
 		super();
@@ -53,21 +53,21 @@ public class GameScreen extends Pane{
 			}
 		});
 
-		this.canvas.setOnMousePressed((MouseEvent event) -> {
+		canvas.setOnMousePressed((MouseEvent event) -> {
 			if (event.getButton() == MouseButton.PRIMARY)
 				InputUtility.mouseLeftDown();
 		});
 
-		this.canvas.setOnMouseReleased((MouseEvent event) -> {
+		canvas.setOnMouseReleased((MouseEvent event) -> {
 			if (event.getButton() == MouseButton.PRIMARY)
 				InputUtility.mouseLeftRelease();
 		});
 		
-		this.canvas.setOnMouseEntered((MouseEvent event) -> {
+		canvas.setOnMouseEntered((MouseEvent event) -> {
 			InputUtility.mouseOnScreen = true;
 		});
 
-		this.canvas.setOnMouseExited((MouseEvent event) -> {
+		canvas.setOnMouseExited((MouseEvent event) -> {
 			InputUtility.mouseOnScreen = false;
 		});
 	}
@@ -82,5 +82,8 @@ public class GameScreen extends Pane{
 			}
 		}
 
+	}
+	public static Canvas getCanvas(){
+		return canvas;
 	}
 }
